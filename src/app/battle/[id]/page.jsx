@@ -135,6 +135,20 @@ export default function Page({ params }) {
     return () => clearInterval(interval);
   });
 
+  const cancelmatch = async () => {
+    const roomid = "duel" + roomcode;
+    const url = `/api/room/cancel/${roomid}`;
+
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.message);
+      }
+    } catch (error) {}
+  };
+
   if (!roomdata) {
     return (
       <>
@@ -153,6 +167,7 @@ export default function Page({ params }) {
           starttime={roomdata.match_data.start_time}
           timelimit={roomdata.settings.time_limit_mins}
           roomdata={roomdata}
+          cancelmatch={cancelmatch}
         />
 
         <div className="flex-1 max-w-7xl mx-auto w-full grid grid-cols-12 gap-6 p-6">

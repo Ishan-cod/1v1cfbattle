@@ -1,7 +1,13 @@
 "use client";
 import React, { useEffect, useState } from "react";
 
-export function BattleHeader({ roomid, starttime, timelimit, roomdata }) {
+export function BattleHeader({
+  roomid,
+  starttime,
+  timelimit,
+  roomdata,
+  cancelmatch,
+}) {
   const [timeleft, settimeleft] = useState("");
 
   useEffect(() => {
@@ -15,6 +21,7 @@ export function BattleHeader({ roomid, starttime, timelimit, roomdata }) {
       const remaining = endtimems - now;
 
       if (remaining <= 0) {
+        cancelmatch();
         settimeleft("Match Over");
         clearInterval(interval);
         return;
@@ -58,7 +65,10 @@ export function BattleHeader({ roomid, starttime, timelimit, roomdata }) {
           </div>
 
           <div className="flex items-center gap-3">
-            <button className="text-xs font-bold text-slate-400 hover:text-white transition">
+            <button
+              className="text-xs font-bold text-slate-400 hover:text-white transition"
+              onClick={cancelmatch}
+            >
               SURRENDER
             </button>
           </div>
