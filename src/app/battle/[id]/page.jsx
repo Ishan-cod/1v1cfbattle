@@ -120,6 +120,7 @@ export default function Page({ params }) {
             clearInterval(interval);
           }
         } catch (error) {
+          failure += 1;
           if (failure >= 5) {
             alert("ERROR GETTING MATCH DATA! PLEASE TRY AGAIN");
             clearInterval(interval);
