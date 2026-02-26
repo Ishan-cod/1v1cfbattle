@@ -130,7 +130,7 @@ export default function Page({ params }) {
       };
 
       fetchroomdata();
-    }, 3000);
+    }, 6000);
 
     return () => clearInterval(interval);
   });
