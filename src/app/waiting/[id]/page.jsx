@@ -76,8 +76,6 @@ export default function Page({ params }) {
         sethostdata(players.host || null);
         setguestdata(players.guest || null);
 
-        // console.log(players.guest)
-
         const status = data.roomstatus.status;
         if (status === "READY") {
           setreadyroom(true);

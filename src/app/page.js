@@ -14,6 +14,10 @@ export default function Page() {
   const [cfid, setcfid] = useState(null);
   const [roomid, setroomid] = useState(null);
   const [loading, setloading] = useState(false);
+  const [buttondisabled, setbuttondisabled] = useState(true);
+  const [userverified, setuserverified] = useState(false);
+  const [verificationloading, setverificationloading] = useState(false);
+
   const router = useRouter();
 
   const handlegenerateroom = async () => {
@@ -137,12 +141,53 @@ export default function Page() {
     }
   };
 
+  const verifycfid = async () => {
+    setverificationloading(true);
+    try {
+      if (!cfid) {
+        throw new Error("Please provide CF ID");
+      }
+
+      const codeforceid = cfid.trim();
+      const url = "/api/user/verify";
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          cfhandle: codeforceid,
+        }),
+      });
+
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.message);
+      }
+
+      setbuttondisabled(false);
+      setuserverified(true);
+      setverificationloading(false);
+    } catch (error) {
+      setverificationloading(false);
+      setbuttondisabled(true);
+      setuserverified(false);
+      alert(error.message);
+    }
+  };
+
   return (
     <div className="bg-slate-950 text-slate-200 min-h-screen flex flex-col items-center justify-center p-6 font-sans bg-[radial-gradient(circle_at_top,var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-slate-950">
       <LandingHeader />
 
       <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl shadow-black/50">
-        <LandingInput setcfid={setcfid} />
+        <LandingInput
+          setcfid={setcfid}
+          verifycfid={verifycfid}
+          isloading={verificationloading}
+          isverified={userverified}
+          setisverified={setuserverified}
+        />
 
         <div className="flex bg-slate-950 p-1 rounded-xl mb-6 border border-slate-800">
           <LandingCreateButton setmode={setMode} mode={mode} />
@@ -153,14 +198,26 @@ export default function Page() {
           <LandingCreateRoom
             loading={loading}
             handlecreateroom={handlegenerateroom}
+            isbuttondisabled={buttondisabled}
           />
         ) : (
           <LandingJoinRoom
             setroomid={setroomid}
             loading={loading}
             handlejoinroom={handlejoinroom}
+            isbuttondisabled={buttondisabled}
           />
         )}
+
+        <div className="w-full flex justify-center my-2">
+          <a
+            href="/leaderboard"
+            target="_blank"
+            className="uppercase text-xs font-mono tracking-widest font-bold opacity-50"
+          >
+            check leaderboard
+          </a>
+        </div>
       </div>
     </div>
   );

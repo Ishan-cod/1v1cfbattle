@@ -1,6 +1,8 @@
 import dbconnect from "@/lib/dbconnect";
 import { getusersubmission } from "@/lib/getusersubmissions";
 import roomModel from "@/model/room.model";
+import userModel from "@/model/user.model";
+import mongoose from "mongoose";
 
 export async function POST(request) {
   await dbconnect();
@@ -39,6 +41,30 @@ export async function POST(request) {
     );
   }
 
+  const player1 = room.players.host.handle;
+  const player2 = room.players.guest.handle;
+
+  if (player1 !== cfhandle && player2 !== cfhandle) {
+    return Response.json(
+      {
+        success: false,
+        message: "Player donot exist in the match",
+      },
+      { status: 500 },
+    );
+  }
+
+  let probable_winner;
+  let probable_loser;
+
+  if (player1 === cfhandle) {
+    probable_winner = player1;
+    probable_loser = player2;
+  } else {
+    probable_winner = player2;
+    probable_loser = player1;
+  }
+
   try {
     const contestid = room.match_data.problem.id;
     const problemindex = room.match_data.problem.index;
@@ -62,6 +88,42 @@ export async function POST(request) {
       room.status = "FINISHED";
 
       await room.save();
+
+      // UPDATE IN USER MODEL AS THE WINNER AND LOSER
+
+      const session = await mongoose.startSession();
+
+      try {
+        const winner = await userModel.findOne(
+          { handle: probable_winner },
+          null,
+          { session },
+        );
+
+        const loser = await userModel.findOne(
+          { handle: probable_loser },
+          null,
+          { session },
+        );
+
+        if (!winner || !loser) {
+          throw new Error("USER NOT FOUND");
+        }
+
+        winner.wins = winner.wins + 1;
+        loser.losses = loser.losses + 1;
+
+        await winner.save({ session });
+        await loser.save({ session });
+
+        await session.commitTransaction();
+      } catch (error) {
+        await session.abortTransaction();
+      } finally {
+        session.endSession();
+      }
+
+      // ** END **
 
       return Response.json(
         {

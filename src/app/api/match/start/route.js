@@ -89,10 +89,6 @@ export async function POST(request) {
     );
   } catch (error) {
 
-    // DEBUG:
-    console.log(error)
-
-
     return Response.json(
       {
         success: false,
