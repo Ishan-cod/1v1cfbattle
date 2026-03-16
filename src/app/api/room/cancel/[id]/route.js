@@ -1,7 +1,7 @@
 import dbconnect from "@/lib/dbconnect";
 import roomModel from "@/model/room.model";
 
-export async function POST(request, { params }) {
+export async function GET(request, { params }) {
   await dbconnect();
   const { id } = await params;
 

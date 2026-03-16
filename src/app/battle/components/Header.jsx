@@ -11,19 +11,16 @@ export function BattleHeader({
   const [timeleft, settimeleft] = useState("");
 
   useEffect(() => {
-    const startms = starttime * 1000;
-    const durationms = timelimit * 60 * 1000;
-
-    const endtimems = startms + durationms;
+    const endtimems = starttime * 1000 + timelimit * 60 * 1000;
 
     const interval = setInterval(() => {
       const now = Date.now();
       const remaining = endtimems - now;
 
       if (remaining <= 0) {
-        cancelmatch();
-        settimeleft("Match Over");
         clearInterval(interval);
+        settimeleft("Match Over");
+        cancelmatch();
         return;
       }
 
@@ -32,7 +29,9 @@ export function BattleHeader({
 
       settimeleft(`${minutes}:${seconds.toString().padStart(2, "0")}`);
     }, 1000);
-  });
+
+    return () => clearInterval(interval);
+  }, [starttime, timelimit, cancelmatch]);
 
   return (
     <>

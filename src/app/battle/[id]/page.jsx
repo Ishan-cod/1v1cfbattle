@@ -19,6 +19,7 @@ export default function Page({ params }) {
   const [roomdata, setroomdata] = useState(null);
   const [activeuser, setactiveuser] = useState({ handle: "", role: "" });
   const [verifyloading, setverifyloading] = useState(false);
+  const [livefeed, setlivefeed] = useState([]);
 
   useEffect(() => {
     try {
@@ -50,7 +51,25 @@ export default function Page({ params }) {
       setroomdata(data.roomstatus);
     };
 
+    const getlivefeed = async () => {
+      try {
+        const url = `/api/match/feed/duel${roomcode}`;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error("failed to get live feed");
+        }
+
+        const feed = data.feed;
+        setlivefeed(feed);
+      } catch (error) {
+        console.error(error.message);
+      }
+    };
+
     fetchroomdata();
+    getlivefeed();
   }, [roomcode]);
 
   const verifysubmission = async () => {
@@ -100,40 +119,40 @@ export default function Page({ params }) {
   };
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      let failure = 0;
-      const fetchroomdata = async () => {
-        try {
-          const url = `/api/room/status/duel${roomcode}`;
-          const response = await fetch(url);
-          const data = await response.json();
+    let failure = 0;
+    let interval;
 
-          if (!data.success) {
-            setroomfound(false);
-            setroommessage(data.message);
+    const fetchroomdata = async () => {
+      try {
+        const url = `/api/room/status/duel${roomcode}`;
+        const response = await fetch(url);
+        const data = await response.json();
 
-            throw new Error("Error founding room status");
-          }
-
-          setroomdata(data.roomstatus);
-          if (data.roomstatus.status === "FINISHED") {
-            clearInterval(interval);
-          }
-        } catch (error) {
-          failure += 1;
-          if (failure >= 5) {
-            alert("ERROR GETTING MATCH DATA! PLEASE TRY AGAIN");
-            clearInterval(interval);
-            router.push("/");
-          }
+        if (!data.success) {
+          setroomfound(false);
+          setroommessage(data.message);
+          throw new Error("Error finding room status");
         }
-      };
 
-      fetchroomdata();
-    }, 6000);
+        setroomdata(data.roomstatus);
 
+        if (data.roomstatus.status === "CANCELLED") {
+          clearInterval(interval);
+        }
+      } catch (error) {
+        failure += 1;
+        if (failure >= 5) {
+          alert("ERROR GETTING MATCH DATA! PLEASE TRY AGAIN");
+          clearInterval(interval);
+          router.push("/");
+        }
+      }
+    };
+
+    interval = setInterval(fetchroomdata, 15000);
+    fetchroomdata();
     return () => clearInterval(interval);
-  });
+  }, [roomcode, router]);
 
   const cancelmatch = async () => {
     const roomid = "duel" + roomcode;
@@ -147,6 +166,23 @@ export default function Page({ params }) {
         throw new Error(data.message);
       }
     } catch (error) {}
+  };
+
+  const getlivefeed = async () => {
+    try {
+      const url = `/api/match/feed/duel${roomcode}`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error("failed to get live feed");
+      }
+
+      const feed = data.feed;
+      setlivefeed(feed);
+    } catch (error) {
+      console.error(error.message);
+    }
   };
 
   if (!roomdata) {
@@ -182,6 +218,8 @@ export default function Page({ params }) {
                 ? roomdata.players.guest
                 : roomdata.players.host
             }
+            feed={livefeed}
+            getlivefeed={getlivefeed}
           />
         </div>
 

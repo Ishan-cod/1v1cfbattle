@@ -1,6 +1,7 @@
 import React from "react";
+import { LiveFeed } from "./LiveFeed";
 
-export function Opponent({opponentdata}) {
+export function Opponent({ opponentdata, getlivefeed, feed}) {
   return (
     <>
       <section className="col-span-3 space-y-6">
@@ -10,7 +11,9 @@ export function Opponent({opponentdata}) {
               OPP
             </div>
             <div>
-              <h2 className="font-bold text-slate-200">{opponentdata.handle}</h2>
+              <h2 className="font-bold text-slate-200">
+                {opponentdata.handle}
+              </h2>
             </div>
           </div>
           <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
@@ -21,26 +24,7 @@ export function Opponent({opponentdata}) {
           </p>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-xl flex flex-col h-75">
-          <div className="p-3 border-b border-slate-800 flex justify-between items-center">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">
-              Live Feed
-            </span>
-            <span className="w-2 h-2 rounded-full bg-emerald-500 panic-pulse"></span>
-          </div>
-          <div className="flex-1 p-4 mono text-[11px] space-y-3 overflow-y-auto">
-            <p className="text-slate-500">[12:04] Match started.</p>
-            <p className="text-red-400">
-              <span className="text-slate-600">benq:</span> WRONG ANSWER (Test 4)
-            </p>
-            <p className="text-amber-400 panic-pulse">
-              <span className="text-slate-600">benq:</span> TESTING TEST 12...
-            </p>
-            <p className="text-slate-400">
-              <span className="text-slate-600">tourist:</span> COMPILATION ERROR
-            </p>
-          </div>
-        </div>
+        <LiveFeed getlivefeed={getlivefeed} livefeed={feed}/>
       </section>
     </>
   );
