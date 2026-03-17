@@ -29,7 +29,7 @@ export async function POST(request) {
     );
   }
 
-// TODO:
+  // TODO:
   if (room.status == "ONGOING") {
     return Response.json(
       {
@@ -52,7 +52,18 @@ export async function POST(request) {
   try {
     const { rating_min, rating_max, tags } = room.settings;
 
-    const problemArray = await fetchproblem(tags, rating_min, rating_max);
+    // getting user handle of the room
+    const user1 = room.players.host.handle;
+    const user2 = room.players.guest.handle;
+
+    const problemArray = await fetchproblem(
+      tags,
+      rating_min,
+      rating_max,
+      1,
+      user1,
+      user2,
+    );
 
     const problemindex = problemArray[0].index;
     const problemid = problemArray[0].contestId;
@@ -70,7 +81,7 @@ export async function POST(request) {
         name: problemname,
         url: problemURL,
         rating: problemrating,
-        tags : problemtag
+        tags: problemtag,
       },
       start_time: Math.floor(Date.now() / 1000),
     };
@@ -88,7 +99,6 @@ export async function POST(request) {
       { status: 200 },
     );
   } catch (error) {
-
     return Response.json(
       {
         success: false,
