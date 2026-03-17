@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 1v1 Codeforces Battle
 
-## Getting Started
+> ⚔️ Turn competitive programming into a duel — two coders, same problems, one scoreboard.
 
-First, run the development server:
+![demo](assets/demo.gif)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+**Live demo:** [https://errorbattle.vercel.app/](https://errorbattle.vercel.app/)
+**Repo:** [https://github.com/Ishan-cod/1v1cfbattle](https://github.com/Ishan-cod/1v1cfbattle)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## What is this?
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+A tiny MVP web app that pairs two coders into a head-to-head match using Codeforces problems. Both players receive the same problem set, a countdown timer runs, and a live scoreboard (powered by simple HTTP polling in v1) shows who solved what first.
 
-## Learn More
+This project is built as a fast-to-ship prototype so I could validate the idea and get real users testing the core flow.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Highlights
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+* 1v1 match lobby (create / join by room code)
+* Same problem set for both players
+* Countdown timer for each match
+* Live scoreboard and per-problem solve status
+* Automatic submission tracking (via Codeforces public API / polling)
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Tech stack
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+* **Frontend:** Next - client UI, lobby, scoreboard
+* **Backend:** NextJS — match lifecycle, problem selection
+* **Database:** MongoDB (for rooms, match history, users)
+* **Realtime (v1):** HTTP polling (simple, reliable)
+* **Future:** Socket.io / WebSockets for true realtime
+
+---
+
+## How it works (high level)
+
+1. A player creates a room or joins an existing one with a room code.
+2. When two players are present, the server picks a set of Codeforces problems (based on rating/tags or a random pack).
+3. The match starts: a countdown timer begins and both players see identical problems.
+4. Players submit solutions using their Codeforces account — the server polls the Codeforces API for each player's submissions and updates the scoreboard.
+5. The match ends when time expires or all problems are solved; the server calculates scores/winner and stores match stats.
+
+---
+
+## Why HTTP polling for v1?
+
+* Fast to implement and easy to reason about while building the MVP.
+* Keeps hosting simple (no sticky sessions or socket support needed).
+* Good enough to validate the core idea.
+
+Tradeoff: more requests and higher latency vs. better UX. Plan is to migrate to WebSockets (Socket.io) for v2.
+
+---
+
+## Roadmap (v2+)
+
+* ✅ MVP: Lobby, same problems, polling-based scoreboard
+* 🔜 Replace polling with Socket.io WebSockets for low-latency updates
+* 🔜 Add authentication + profile pages and ELO-like rating
+* 🔜 Spectator mode + match replay
+* 🔜 Tournaments (round-robin / bracket)
+* 🔜 Deployment automation + prettier OG images for link previews
+
+
+
+## Contact / Want to duel?
+
+* Live demo: [https://errorbattle.vercel.app/](https://errorbattle.vercel.app/)
+* Repo: [https://github.com/Ishan-cod/1v1cfbattle](https://github.com/Ishan-cod/1v1cfbattle)
+
+Drop a comment or open an issue titled **"1v1 challenge"** — I’ll hop in for a match. ⚔️
+
+---
+
+*Made with ❤️ — MVP-first, iterate fast, ship often.*
