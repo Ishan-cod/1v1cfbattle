@@ -1,7 +1,7 @@
 import React from "react";
 import { LiveFeed } from "./LiveFeed";
 
-export function Opponent({ opponentdata, getlivefeed, feed}) {
+export function Opponent({ opponentdata, getlivefeed, feed }) {
   return (
     <>
       <section className="col-span-3 space-y-6">
@@ -16,15 +16,9 @@ export function Opponent({ opponentdata, getlivefeed, feed}) {
               </h2>
             </div>
           </div>
-          <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-            <div className="bg-red-500 h-full w-2/3 shadow-[0_0_10px_rgba(239,68,68,0.5)]"></div>
-          </div>
-          <p className="text-[10px] text-right mt-1 text-slate-500 font-bold uppercase">
-            Accuracy Gauge
-          </p>
         </div>
 
-        <LiveFeed getlivefeed={getlivefeed} livefeed={feed}/>
+        <LiveFeed getlivefeed={getlivefeed} livefeed={feed} />
       </section>
     </>
   );

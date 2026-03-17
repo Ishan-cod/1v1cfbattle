@@ -1,6 +1,7 @@
 import React from "react";
 
-export function Player({ playerdata }) {
+export function Player({ playerdata, live_feed }) {
+  const filtered_feed = live_feed.filter((e) => e.player == playerdata.handle);
   return (
     <>
       <section className="col-span-3 space-y-6">
@@ -17,12 +18,36 @@ export function Player({ playerdata }) {
             <p className="text-[10px] uppercase font-bold text-slate-500">
               My Submissions
             </p>
-            <div className="text-xs mono p-2 rounded bg-slate-950 border border-slate-800 text-red-400">
-              WA - Test 4
-            </div>
-            <div className="text-xs mono p-2 rounded bg-slate-950 border border-slate-800 text-blue-400">
-              CE - Compilation Error
-            </div>
+            {filtered_feed.map((e, key) => {
+              if (e.verdict == "WRONG_ANSWER") {
+                return (
+                  <div
+                    className="text-xs mono p-2 rounded bg-slate-950 border border-slate-800 text-red-400"
+                    key={key}
+                  >
+                    WA - Test {e.passedtestcase}
+                  </div>
+                );
+              } else if (e.verdict == "OK") {
+                return (
+                  <div
+                    className="text-xs mono p-2 rounded bg-slate-950 border border-slate-800 text-green-400"
+                    key={key}
+                  >
+                    OK - Test {e.passedtestcase}
+                  </div>
+                );
+              } else {
+                return (
+                  <div
+                    className="text-xs mono p-2 rounded bg-slate-950 border border-slate-800 text-blue-400"
+                    key={key}
+                  >
+                    {e.verdict}
+                  </div>
+                );
+              }
+            })}
           </div>
         </div>
       </section>

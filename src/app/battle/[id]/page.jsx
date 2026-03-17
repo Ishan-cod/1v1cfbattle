@@ -207,7 +207,10 @@ export default function Page({ params }) {
         />
 
         <div className="flex-1 max-w-7xl mx-auto w-full grid grid-cols-12 gap-6 p-6">
-          <Player playerdata={roomdata.players[activeuser.role]} />
+          <Player
+            playerdata={roomdata.players[activeuser.role]}
+            live_feed={livefeed}
+          />
           <Question
             problemdata={roomdata.match_data.problem}
             roomdata={roomdata}
