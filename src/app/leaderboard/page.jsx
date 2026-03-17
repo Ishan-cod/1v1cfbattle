@@ -1,5 +1,6 @@
 "use client";
 import { Loader2 } from "lucide-react";
+import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
 
 const page = () => {
@@ -90,7 +91,19 @@ const page = () => {
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-xs font-bold text-blue-500 border border-slate-700">
-                          {player.handle[0].toUpperCase()}
+                          {/* <img src={player.avatar} height={32} width={32} className="rounded-lg"/> */}
+                          {player.avatar ==
+                          "https://userpic.codeforces.org/no-title.jpg" ? (
+                            player.handle[0].toUpperCase()
+                          ) : (
+                            <Image
+                              src={player.avatar}
+                              alt="avatar"
+                              width={32}
+                              height={32}
+                              className="rounded-lg"
+                            />
+                          )}
                         </div>
                         <a
                           href={`https://codeforces.com/profile/${player.handle}`}

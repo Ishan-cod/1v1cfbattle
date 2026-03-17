@@ -6,8 +6,8 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   rating: {
-    type : Number,
-    required : true
+    type: Number,
+    required: true,
   },
   wins: {
     type: Number,
@@ -16,6 +16,9 @@ const userSchema = new mongoose.Schema({
   losses: {
     type: Number,
     default: 0,
+  },
+  avatar: {
+    type: String,
   },
 });
 

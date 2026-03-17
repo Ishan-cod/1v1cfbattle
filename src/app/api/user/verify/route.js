@@ -21,7 +21,6 @@ export async function POST(request) {
   const user = await userModel.findOne({ handle: userhandle });
 
   if (user) {
-    
     // UPDATING USER CURRENT RATING
     try {
       const url = `https://codeforces.com/api/user.info?handles=${userhandle}&checkHistoricHandles=false`;
@@ -30,10 +29,11 @@ export async function POST(request) {
       const data = await response.json();
 
       const userrating = data.result[0].maxRating;
+      const avatarurl = data.result[0].titlePhoto;
+
+      user.avatar = avatarurl;
       user.rating = userrating;
       await user.save();
-
-      
     } catch (error) {
       console.error("Error updating user rating");
     }
@@ -47,7 +47,6 @@ export async function POST(request) {
       { status: 200 },
     );
   }
-
 
   try {
     const url = `https://codeforces.com/api/user.info?handles=${userhandle}&checkHistoricHandles=false`;
@@ -66,11 +65,14 @@ export async function POST(request) {
     }
 
     const userrating = data.result[0].maxRating;
+    const avatarurl = data.result[0].titlePhoto;
+
     const newuser = {
       handle: userhandle,
       rating: userrating,
       wins: 0,
       losses: 0,
+      avatar: avatarurl,
     };
 
     const createduser = await userModel.create(newuser);
