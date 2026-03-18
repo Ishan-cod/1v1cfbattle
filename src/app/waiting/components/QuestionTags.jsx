@@ -10,12 +10,25 @@ const QuestionTags = ({ setquestiontags }) => {
   }, [selectedTags]);
 
   const availableTags = [
+    "binary search",
+    "bitmasks",
+    "brute force",
+    "combinatorics",
+    "data structures",
+    "dfs and similar",
+    "divide and conquer",
+    "dp",
+    "dsu",
+    "expression parsing",
+    "fft",
+    "flows",
+    "games",
+    "geometry",
     "graph matchings",
     "graphs",
     "greedy",
     "hashing",
     "implementation",
-    "interactive",
     "math",
     "matrices",
     "meet-in-the-middle",
@@ -24,10 +37,10 @@ const QuestionTags = ({ setquestiontags }) => {
     "schedules",
     "shortest paths",
     "sortings",
-    "string suffix structures",
     "strings",
     "ternary search",
     "trees",
+    "two pointers",
   ];
 
   const toggleTag = (tag) => {

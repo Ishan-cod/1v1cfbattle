@@ -34,6 +34,12 @@ export async function POST(request) {
     );
   }
 
+  let filteredtags = [];
+  tags.forEach((e) => {
+    let tg = encodeURIComponent(e);
+    filteredtags.push(tg);
+  });
+
   const room = await roomModel.findOne({ roomcode: roomid });
 
   if (!room) {
@@ -50,7 +56,7 @@ export async function POST(request) {
     room.settings = {
       rating_min: minrating,
       rating_max: maxrating,
-      tags: tags,
+      tags: filteredtags,
       time_limit_mins: timelimit || 120,
       questioncount: questioncount,
     };

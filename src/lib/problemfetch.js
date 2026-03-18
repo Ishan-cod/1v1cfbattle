@@ -15,6 +15,10 @@ export async function fetchproblem(
 
   try {
     const url = `https://codeforces.com/api/problemset.problems?tags=${reqtag}`;
+
+    // TODO:REMOVE
+    console.log(url);
+    
     const response = await fetch(url);
     const data = await response.json();
 
