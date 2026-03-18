@@ -31,6 +31,10 @@ const settingschema = new mongoose.Schema(
       type: Number,
       default: 120,
     },
+    questioncount: {
+      type: Number,
+      default: 1,
+    },
   },
   { _id: false },
 );
@@ -42,7 +46,7 @@ const problemschema = new mongoose.Schema(
     name: String,
     url: String,
     rating: Number,
-    tags : [String]
+    tags: [String],
   },
   { _id: false },
 );
@@ -73,7 +77,7 @@ const roomschema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  
+
   status: {
     type: String,
     enum: ["WAITING", "READY", "ONGOING", "FINISHED", "CANCELLED"],
@@ -87,7 +91,7 @@ const roomschema = new mongoose.Schema({
     guest: playerschema,
   },
 
-  match_data: matchdatascheme,
+  match_data: [matchdatascheme],
 
   live_feed: [livefeedschema],
 });

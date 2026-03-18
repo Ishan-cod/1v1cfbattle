@@ -5,7 +5,7 @@ export async function POST(request) {
   await dbconnect();
 
   const body = await request.json();
-  const { roomid, minrating, maxrating, timelimit} = body;
+  const { roomid, minrating, maxrating, timelimit, questioncount } = body;
   const { tags } = body;
 
   if (!Array.isArray(tags)) {
@@ -18,11 +18,20 @@ export async function POST(request) {
     );
   }
 
-  if (!minrating || !maxrating || !roomid || (minrating > maxrating)) {
-    return Response.json({
-      success: false,
-      message: "Rating not provided",
-    });
+  if (
+    !minrating ||
+    !maxrating ||
+    !roomid ||
+    minrating > maxrating ||
+    !questioncount
+  ) {
+    return Response.json(
+      {
+        success: false,
+        message: "Required Parameters not provided! Server Error",
+      },
+      { status: 400 },
+    );
   }
 
   const room = await roomModel.findOne({ roomcode: roomid });
@@ -42,7 +51,8 @@ export async function POST(request) {
       rating_min: minrating,
       rating_max: maxrating,
       tags: tags,
-      time_limit_mins : timelimit || 120
+      time_limit_mins: timelimit || 120,
+      questioncount: questioncount,
     };
 
     await room.save();

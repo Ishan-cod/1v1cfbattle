@@ -23,6 +23,7 @@ export default function Page({ params }) {
   const [questiontags, setquestiontags] = useState([]);
   const [startmatchloader, setstartmatchloader] = useState(false);
   const [handshakeloader, sethandshakeloader] = useState(false);
+  const [questioncount, setquestioncount] = useState(1);
 
   useEffect(() => {
     const verify = async () => {
@@ -147,6 +148,7 @@ export default function Page({ params }) {
           maxrating: maxrating,
           tags: questiontags,
           timelimit: timeduration || 120,
+          questioncount: questioncount || 1,
         }),
       });
 
@@ -222,6 +224,7 @@ export default function Page({ params }) {
           startmatch={startmatch}
           loading={startmatchloader}
           activeuser={activeuser}
+          setquestioncount={setquestioncount}
         />
       </div>
     </div>

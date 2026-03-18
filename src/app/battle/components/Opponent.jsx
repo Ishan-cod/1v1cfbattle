@@ -1,7 +1,15 @@
 import React from "react";
 import { LiveFeed } from "./LiveFeed";
+import { Options } from "./Options";
 
-export function Opponent({ opponentdata, getlivefeed, feed }) {
+export function Opponent({
+  opponentdata,
+  getlivefeed,
+  feed,
+  setqid,
+  qid,
+  qcount,
+}) {
   return (
     <>
       <section className="col-span-3 space-y-6">
@@ -16,6 +24,10 @@ export function Opponent({ opponentdata, getlivefeed, feed }) {
               </h2>
             </div>
           </div>
+
+          {/* options */}
+          <Options setqid={setqid} qcount={qcount} qid={qid} />
+          {/* End here */}
         </div>
 
         <LiveFeed getlivefeed={getlivefeed} livefeed={feed} />

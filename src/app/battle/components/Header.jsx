@@ -54,11 +54,11 @@ export function BattleHeader({
               Time Remaining
             </span>
             <span
-              className="text-3xl font-black mono text-emerald-400 tracking-tighter"
+              className="text-3xl font-black mono text-yellow-300 tracking-tighter"
               id="timer"
             >
-              {roomdata.status === "FINISHED"
-                ? `WINNER : ${roomdata.match_data.winner}`
+              {roomdata.status === "FINISHED" || roomdata.status === "CANCELLED"
+                ? `THANK YOU FOR PLAYING`
                 : timeleft}
             </span>
           </div>

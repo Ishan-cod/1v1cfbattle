@@ -20,6 +20,7 @@ export default function Page({ params }) {
   const [activeuser, setactiveuser] = useState({ handle: "", role: "" });
   const [verifyloading, setverifyloading] = useState(false);
   const [livefeed, setlivefeed] = useState([]);
+  const [qid, setqid] = useState(1);
 
   useEffect(() => {
     try {
@@ -88,6 +89,7 @@ export default function Page({ params }) {
         body: JSON.stringify({
           cfhandle: cfhandle,
           roomid: roomid,
+          sol_id: qid,
         }),
       });
 
@@ -97,7 +99,7 @@ export default function Page({ params }) {
       }
     } catch (error) {
       setverifyloading(false);
-      alert(error.message);
+      alert("PROBLEM CANNOT BE VERIFIED");
     }
 
     try {
@@ -112,7 +114,7 @@ export default function Page({ params }) {
       setroomdata(data.roomstatus);
     } catch (error) {
       setverifyloading(false);
-      alert(error.message);
+      alert("ERROR GETTING ROOM STATUS");
     }
 
     setverifyloading(false);
@@ -200,7 +202,7 @@ export default function Page({ params }) {
       <div className="bg-slate-950 text-slate-200 min-h-screen flex flex-col">
         <BattleHeader
           roomid={roomdata.roomcode}
-          starttime={roomdata.match_data.start_time}
+          starttime={roomdata.match_data[0].start_time}
           timelimit={roomdata.settings.time_limit_mins}
           roomdata={roomdata}
           cancelmatch={cancelmatch}
@@ -212,8 +214,9 @@ export default function Page({ params }) {
             live_feed={livefeed}
           />
           <Question
-            problemdata={roomdata.match_data.problem}
+            problemdata={roomdata.match_data[qid - 1].problem}
             roomdata={roomdata}
+            qid={qid}
           />
           <Opponent
             opponentdata={
@@ -223,6 +226,9 @@ export default function Page({ params }) {
             }
             feed={livefeed}
             getlivefeed={getlivefeed}
+            qid={qid}
+            setqid={setqid}
+            qcount={roomdata.settings.questioncount}
           />
         </div>
 

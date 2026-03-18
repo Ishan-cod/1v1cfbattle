@@ -5,6 +5,7 @@ import { Timelimit } from "./Timelimit";
 import { Settings } from "lucide-react";
 import QuestionTags from "./QuestionTags";
 import { Loader2 } from "lucide-react";
+import { NumberOfQuestion } from "./NumberOfQuestion";
 
 const MatchSetting = ({
   minrating,
@@ -17,6 +18,7 @@ const MatchSetting = ({
   startmatch,
   loading,
   activeuser,
+  setquestioncount
 }) => {
   return (
     <div className="col-span-12 lg:col-span-4 space-y-6">
@@ -31,6 +33,7 @@ const MatchSetting = ({
         <div className="space-y-4">
           <Difficulty setmaxrating={setmaxrating} setminrating={setminrating} />
           <Timelimit settimelimit={settimeduration} />
+          <NumberOfQuestion setquestioncount={setquestioncount}/>
           <QuestionTags setquestiontags={setquestiontags} />
         </div>
 

@@ -28,7 +28,7 @@ export async function fetchproblem(
       (p) => p.rating >= min_rating && p.rating <= max_rating,
     );
 
-    if (samplespace.length === 0) {
+    if (samplespace.length < count) {
       console.warn(
         "No problems found with specific tags/ratings. Falling back to rating only.",
       );
@@ -44,8 +44,8 @@ export async function fetchproblem(
 
     // getting already solved problem set
     let alreadysolved;
-    console.log(user1);
-    console.log(user2);
+    // console.log(user1);
+    // console.log(user2);
 
     if (user1 && user2) {
       alreadysolved = await alreadySubmittedCheck(user1, user2);
@@ -58,7 +58,7 @@ export async function fetchproblem(
     if (size === 0) throw new Error("No problems found in this rating range");
 
     const problemset = [];
-
+    const addedset = new Set();
     // TODO:
     // console.log(solvedset);
 
@@ -67,22 +67,24 @@ export async function fetchproblem(
       let ind = Math.floor(Math.random() * size);
 
       let problemid = `${samplespace[ind].contestId}${samplespace[ind].index}`;
-      console.log("problemid" + problemid);
-
+      // console.log("problemid" + problemid);
 
       // Retrying 10 times before giving random problem
-      while (solvedset.has(problemid) && retry <= 10) {
+      while (
+        (solvedset.has(problemid) || addedset.has(problemid)) &&
+        retry <= 10
+      ) {
         ind = Math.floor(Math.random() * size);
         problemid = `${samplespace[ind].contestId}${samplespace[ind].index}`;
 
         console.log("problemid" + problemid);
         retry += 1;
 
-        console.log("retry" - retry);
       }
 
       // retry fail or pass set probelm.
       problemset.push(samplespace[ind]);
+      addedset.add(problemid);
     }
 
     return problemset;

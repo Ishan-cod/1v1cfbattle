@@ -33,28 +33,32 @@ export async function GET(request, { params }) {
         success: false,
         message: "NO MATCH IS RUNNING IN THE ROOM",
       },
-      { status: 500 },
+      { status: 400 },
     );
   }
 
   const players = room.players;
-
   const hostid = players.host.handle;
   const guestid = players.guest.handle;
-
-  const problemdata = room.match_data.problem;
-  const problemindex = problemdata.index;
-  const problemid = problemdata.id;
+  const roomproblemcount = room.settings.questioncount;
   const matchstarttime = room.match_data.start_time;
 
+  const problemdata = [];
+  for (let i = 0; i < roomproblemcount; i++) {
+    problemdata.push(room.match_data[i].problem);
+  }
+
   try {
-    const hosturl = `https://codeforces.com/api/user.status?handle=${hostid}&from=1&count=10`;
-    const guesturl = `https://codeforces.com/api/user.status?handle=${guestid}&from=1&count=10`;
+    const [hostresponse, guestresponse] = await Promise.all([
+      fetch(
+        `https://codeforces.com/api/user.status?handle=${hostid}&from=1&count=20`,
+      ),
+      fetch(
+        `https://codeforces.com/api/user.status?handle=${guestid}&from=1&count=20`,
+      ),
+    ]);
 
-    const hostresponse = await fetch(hosturl);
-    const guestresponse = await fetch(guesturl);
-
-    if (hostresponse.status !== 200 || guestresponse.status !== 200) {
+    if (!hostresponse.ok || !guestresponse.ok) {
       throw new Error("CODEFORCE RESPONSE FETCH FAILED");
     }
 
@@ -64,19 +68,7 @@ export async function GET(request, { params }) {
     const hostsubmissionarray = hostdata.result;
     const guestsubmissionarray = guestdata.result;
 
-    const filteredhost = hostsubmissionarray.filter(
-      (e) =>
-        e.creationTimeSeconds >= matchstarttime &&
-        e.problem.contestId == problemid &&
-        e.problem.index == problemindex,
-    );
-
-    const filteredguest = guestsubmissionarray.filter(
-      (e) =>
-        e.creationTimeSeconds >= matchstarttime &&
-        e.problem.contestId == problemid &&
-        e.problem.index == problemindex,
-    );
+    const problemSet = new Set(problemdata.map((p) => `${p.id}-${p.index}`));
 
     let live_feed = [
       {
@@ -88,30 +80,37 @@ export async function GET(request, { params }) {
         memoryused_byte: 0,
       },
     ];
-    filteredhost.map((e) => {
-      const add = {
-        player: hostid,
-        passedtestcase: e.passedTestCount,
-        submissiontime: e.creationTimeSeconds,
-        verdict: e.verdict,
-        timeconsumed_ms: e.timeConsumedMillis,
-        memoryused_byte: e.memoryConsumedBytes,
-      };
 
-      live_feed.push(add);
+    hostsubmissionarray.forEach((e) => {
+      if (
+        e.creationTimeSeconds >= matchstarttime &&
+        problemSet.has(`${e.problem.contestId}-${e.problem.index}`)
+      ) {
+        live_feed.push({
+          player: hostid,
+          passedtestcase: e.passedTestCount,
+          submissiontime: e.creationTimeSeconds,
+          verdict: e.verdict,
+          timeconsumed_ms: e.timeConsumedMillis,
+          memoryused_byte: e.memoryConsumedBytes,
+        });
+      }
     });
 
-    filteredguest.map((e) => {
-      const add = {
-        player: guestid,
-        passedtestcase: e.passedTestCount,
-        submissiontime: e.creationTimeSeconds,
-        verdict: e.verdict,
-        timeconsumed_ms: e.timeConsumedMillis,
-        memoryused_byte: e.memoryConsumedBytes,
-      };
-
-      live_feed.push(add);
+    guestsubmissionarray.forEach((e) => {
+      if (
+        e.creationTimeSeconds >= matchstarttime &&
+        problemSet.has(`${e.problem.contestId}-${e.problem.index}`)
+      ) {
+        live_feed.push({
+          player: guestid,
+          passedtestcase: e.passedTestCount,
+          submissiontime: e.creationTimeSeconds,
+          verdict: e.verdict,
+          timeconsumed_ms: e.timeConsumedMillis,
+          memoryused_byte: e.memoryConsumedBytes,
+        });
+      }
     });
 
     live_feed.sort((a, b) => b.submissiontime - a.submissiontime);
@@ -125,7 +124,7 @@ export async function GET(request, { params }) {
       { status: 200 },
     );
   } catch (error) {
-    console.log
+    console.error(error);
     return Response.json(
       {
         success: false,
