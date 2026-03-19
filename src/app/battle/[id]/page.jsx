@@ -97,6 +97,29 @@ export default function Page({ params }) {
       if (!data.success) {
         throw new Error(data.message);
       }
+
+      // if verification success (update history)
+      try {
+        const hurl = "/api/user/historyupdate";
+        const hresponse = await fetch(hurl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            roomid: roomid,
+            pid: qid,
+          }),
+        });
+
+        const data = await hresponse.json();
+        if (!data.success) {
+          throw new Error("error setting history of winner and loser");
+        }
+      } catch (error) {
+        console.error("error setting loser and winner history");
+      }
+      // END
     } catch (error) {
       setverifyloading(false);
       alert("PROBLEM CANNOT BE VERIFIED");
