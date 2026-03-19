@@ -1,4 +1,5 @@
 "use client";
+import { Clock } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
@@ -65,6 +66,7 @@ const page = () => {
               <th className="px-8 py-4">Rating</th>
               <th className="px-8 py-4 text-right">W / L</th>
               <th className="px-8 py-4 text-right">Arena Rating</th>
+              <th className="px-8 py-4 text-right">Match history</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800/50">
@@ -91,7 +93,6 @@ const page = () => {
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-xs font-bold text-blue-500 border border-slate-700">
-                          {/* <img src={player.avatar} height={32} width={32} className="rounded-lg"/> */}
                           {player.avatar ==
                           "https://userpic.codeforces.org/no-title.jpg" ? (
                             player.handle[0].toUpperCase()
@@ -131,6 +132,11 @@ const page = () => {
                       <span className="text-yellow-300 font-mono font-bold">
                         {Math.floor(getPowerIndex(player))}
                       </span>
+                    </td>
+                    <td className="px-8 py-5 text-blue-400 font-mono font-bold text-right items-center justify-end flex">
+                      <a href={`/history/${player.handle}`} target="_blank">
+                        <Clock className="hover: cursor-pointer" />
+                      </a>
                     </td>
                   </tr>
                 ))}

@@ -8,6 +8,7 @@ import { LandingCreateButton } from "./components/LandingCreateButton";
 import { LandingJoinButton } from "./components/LandingJoinButton";
 import Error from "next/error";
 import { useRouter } from "next/navigation";
+import { FeatureUpdateBanner } from "./components/LandingFeatureUpdateBanner";
 
 export default function Page() {
   const [mode, setMode] = useState("create");
@@ -178,6 +179,7 @@ export default function Page() {
 
   return (
     <div className="bg-slate-950 text-slate-200 min-h-screen flex flex-col items-center justify-center p-6 font-sans bg-[radial-gradient(circle_at_top,var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-slate-950">
+      <FeatureUpdateBanner/>
       <LandingHeader />
 
       <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl shadow-black/50">

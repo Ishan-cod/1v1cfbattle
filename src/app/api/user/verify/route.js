@@ -1,4 +1,5 @@
 import dbconnect from "@/lib/dbconnect";
+import historyModel from "@/model/history.model";
 import userModel from "@/model/user.model";
 
 export async function POST(request) {
@@ -39,6 +40,17 @@ export async function POST(request) {
     }
     // END
 
+    // Checking for already existing history roomModel
+    const userhistory = await historyModel.findOne({ handle: userhandle });
+    if (!userhistory) {
+      // Create
+      const newhistory = {
+        handle: userhandle,
+      };
+      const createdhistory = await historyModel.create(newhistory);
+      // END
+    }
+    // END
     return Response.json(
       {
         success: true,
@@ -74,6 +86,13 @@ export async function POST(request) {
       losses: 0,
       avatar: avatarurl,
     };
+
+    // new history model created
+    const newhistory = {
+      handle: userhandle,
+    };
+    const createdhistory = await historyModel.create(newhistory);
+    // history model creation ended
 
     const createduser = await userModel.create(newuser);
     return Response.json(
