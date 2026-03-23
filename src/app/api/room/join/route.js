@@ -28,19 +28,44 @@ export async function POST(request) {
     );
   }
 
+  if (room.status !== "WAITING") {
+    return Response.json(
+      {
+        success: false,
+        message: "Room started, or cancelled",
+      },
+      { status: 400 },
+    );
+  }
+
   try {
     room.status = "WAITING";
     room.players.host.is_ready = false;
-    room.players.guest = {
+
+    const currentguests = room.players.guest;
+    const possibleplayerinroom = room.playercount;
+
+    // possibleplayer - 1 = for host
+    if (currentguests.length >= possibleplayerinroom - 1) {
+      return Response.json(
+        {
+          success: false,
+          message: "Room already full",
+        },
+        { status: 400 },
+      );
+    }
+    const newguest = {
       handle: guestid,
       is_ready: false,
     };
+    room.players.guest.push(newguest);
 
     await room.save();
 
     return Response.json({
       success: true,
-      message: "User 2 joined successfully",
+      message: "New guest joined successfully",
       roomid: roomid,
     });
   } catch (error) {

@@ -45,27 +45,35 @@ export async function POST(request) {
     }
 
     const problemwinner = setproblemdata.winner;
+
+    if (!problemwinner) {
+      return Response.json(
+        {
+          success: false,
+          message: "The winner is not declared in this problem",
+        },
+        { status: 404 },
+      );
+    }
+
     const starttime = setproblemdata.start_time;
     const endtime = setproblemdata.end_time;
     const problemid = setproblemdata.problem.id + setproblemdata.problem.index;
 
     const roomplayers = roomdata.players;
-    const player1 = roomplayers.host.handle;
-    const player2 = roomplayers.guest.handle;
 
-    let problemloser;
-    if (player1 == problemwinner) {
-      problemloser = player2;
-    } else problemloser = player1;
+    const hosthandle = roomplayers.host.handle;
+    const guesthandles = roomplayers.guest.map((guest) => guest.handle);
+    const allplayers = [hosthandle, ...guesthandles];
+    const loserplayers = allplayers.filter((plyr) => plyr !== problemwinner);
 
+    // Winner history update
     const winnerhistory = await historyModel.findOne({ handle: problemwinner });
-    const loserhistory = await historyModel.findOne({ handle: problemloser });
-
-    if (!winnerhistory || !loserhistory) {
+    if (!winnerhistory) {
       return Response.json(
         {
           success: false,
-          message: "History model fetch request failed",
+          message: "Winner not found",
         },
         { status: 404 },
       );
@@ -75,31 +83,32 @@ export async function POST(request) {
       roomcode: roomid,
       starttime: starttime,
       endtime: endtime,
-      opponent: problemloser,
+      opponent: allplayers,
+      winner: problemwinner,
       problemid: problemid,
       status: "WIN",
     };
 
-    const loserarraypushdata = {
+    winnerhistory.match.push(winnerarraypushdata);
+    await winnerhistory.save();
+    // END
+
+    // Loser historyupdate
+    const loserMatchData = {
       roomcode: roomid,
       starttime: starttime,
       endtime: endtime,
-      opponent: problemwinner,
+      opponent: allplayers,
+      winner: problemwinner,
       problemid: problemid,
       status: "LOSS",
     };
 
-    const winnermatcharray = winnerhistory.match;
-    const losermatcharray = loserhistory.match;
-
-    winnermatcharray.push(winnerarraypushdata);
-    losermatcharray.push(loserarraypushdata);
-
-    winnerhistory.match = winnermatcharray;
-    await winnerhistory.save();
-
-    loserhistory.match = losermatcharray;
-    await loserhistory.save();
+    const result = await historyModel.updateMany(
+      { handle: { $in: loserplayers } },
+      { $push: { match: loserMatchData } },
+    );
+    // END
 
     return Response.json(
       {

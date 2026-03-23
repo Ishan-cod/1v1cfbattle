@@ -1,11 +1,10 @@
 "use client";
 import React, { use, useEffect, useState } from "react";
 import { LobbyHeader } from "../components/LobbyHeader";
-import { Host } from "../components/Host";
 import { MatchSetting } from "../components/MatchSetting";
 import { useRouter } from "next/navigation";
-import { WaitingGuest } from "../components/WaitingGuest";
-import ReadyGuest from "../components/ReadyGuest";
+import { PlayerWaitingArea } from "../components/PlayerWaitingArea";
+import { Loader2 } from "lucide-react";
 
 export default function Page({ params }) {
   const unwrappedparam = use(params);
@@ -18,12 +17,13 @@ export default function Page({ params }) {
 
   const [activeuser, setactiveuser] = useState({ handle: "", role: "" });
   const [hostdata, sethostdata] = useState();
-  const [guestdata, setguestdata] = useState();
+  const [guestdata, setguestdata] = useState([]);
   const [readyroom, setreadyroom] = useState(false);
   const [questiontags, setquestiontags] = useState([]);
   const [startmatchloader, setstartmatchloader] = useState(false);
   const [handshakeloader, sethandshakeloader] = useState(false);
   const [questioncount, setquestioncount] = useState(1);
+  const [totalroomplayer, settotalroomplayer] = useState(0);
 
   useEffect(() => {
     const verify = async () => {
@@ -35,7 +35,7 @@ export default function Page({ params }) {
         }
 
         const { cfhandle, role } = parsedval;
-        const roomcode = "duel" + roomid;
+        const roomcode = roomid;
         const response = await fetch(`/api/room/status/${roomcode}`);
         const data = await response.json();
 
@@ -44,9 +44,14 @@ export default function Page({ params }) {
         }
 
         const playerdata = data.roomstatus.players;
-        const role_id = playerdata[role].handle;
+        const host_id = playerdata["host"].handle;
+        const foundinguest = playerdata["guest"].some(
+          (e) => e.handle == cfhandle,
+        );
 
-        if (role_id !== cfhandle) {
+        if (host_id != cfhandle && !foundinguest) {
+          console.log(role_id);
+          console.log(cfhandle);
           throw new Error("USER ROLE AND ID DONOT MATCH");
         }
         setactiveuser({ handle: cfhandle, role: role });
@@ -63,7 +68,7 @@ export default function Page({ params }) {
     let failurecount = 0;
     const interval = setInterval(async () => {
       try {
-        const roomcode = "duel" + roomid;
+        const roomcode = roomid;
         const url = `/api/room/status/${roomcode}`;
 
         const response = await fetch(url);
@@ -73,7 +78,9 @@ export default function Page({ params }) {
           throw new Error("Error fetching room data");
         }
 
+        const playercount = data.roomstatus.playercount;
         const players = data.roomstatus.players;
+        settotalroomplayer(playercount);
         sethostdata(players.host || null);
         setguestdata(players.guest || null);
 
@@ -103,8 +110,9 @@ export default function Page({ params }) {
   const handshake = async () => {
     sethandshakeloader(true);
     try {
-      const roomcode = "duel" + roomid;
+      const roomcode = roomid;
       const cfhandle = activeuser.handle;
+      // console.log(roomcode);
 
       const url = "/api/room/handshake";
       const response = await fetch(url, {
@@ -132,7 +140,7 @@ export default function Page({ params }) {
   };
 
   const startmatch = async () => {
-    const roomcode = "duel" + roomid;
+    const roomcode = roomid;
     setstartmatchloader(true);
 
     try {
@@ -207,9 +215,22 @@ export default function Page({ params }) {
       <LobbyHeader roomid={roomid} handshake={handshake} />
 
       <div className="w-full max-w-5xl grid grid-cols-12 gap-8">
-        <div className="col-span-12 lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          {hostdata ? <Host host={hostdata} /> : <WaitingGuest />}
-          {guestdata ? <ReadyGuest guest={guestdata} /> : <WaitingGuest />}
+        <div className="col-span-12 lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6 w-full mx-auto">
+          {hostdata ? (
+            <PlayerWaitingArea
+              hostdata={hostdata}
+              guestarray={guestdata}
+              playercount={totalroomplayer}
+              roomreadystatus={readyroom}
+            />
+          ) : (
+            <div className="w-full flex">
+              <Loader2 className="animate-spin" />
+              <span className="font-mono mx-2 font-semibold">
+                Waiting for your opponent! May they not quite from fear!{" "}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* 3. Sidebar (Match Settings) */}

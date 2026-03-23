@@ -43,9 +43,7 @@ export function BattleHeader({
             </span>
             <h1 className="font-bold text-lg tracking-tight">
               ROOM:{" "}
-              <span className="text-blue-400 mono">
-                #DUEL-{roomid.slice(4)}
-              </span>
+              <span className="text-blue-400 mono uppercase">#{roomid}</span>
             </h1>
           </div>
 

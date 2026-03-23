@@ -39,7 +39,7 @@ export async function GET(request, { params }) {
 
   const players = room.players;
   const hostid = players.host.handle;
-  const guestid = players.guest.handle;
+  const guestid = players.guest[0].handle;
   const roomproblemcount = room.settings.questioncount;
   const matchstarttime = room.match_data.start_time;
 

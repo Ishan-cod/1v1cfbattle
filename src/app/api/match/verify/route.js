@@ -44,8 +44,10 @@ export async function POST(request) {
     );
   }
 
-  const player1 = room.players.host.handle;
-  const player2 = room.players.guest.handle;
+  const hosthandle = room.players.host.handle;
+  const guestarray = room.players.guest;
+  const guestindex = guestarray.findIndex((guest) => guest.handle == cfhandle);
+
   const totalproblem_room = room.settings.questioncount;
 
   if (pid < 0 || pid >= totalproblem_room) {
@@ -71,7 +73,7 @@ export async function POST(request) {
     );
   }
 
-  if (player1 !== cfhandle && player2 !== cfhandle) {
+  if (hosthandle !== cfhandle && guestindex === -1) {
     return Response.json(
       {
         success: false,
@@ -79,17 +81,6 @@ export async function POST(request) {
       },
       { status: 500 },
     );
-  }
-
-  let probable_winner;
-  let probable_loser;
-
-  if (player1 === cfhandle) {
-    probable_winner = player1;
-    probable_loser = player2;
-  } else {
-    probable_winner = player2;
-    probable_loser = player1;
   }
 
   try {
@@ -131,32 +122,31 @@ export async function POST(request) {
       await room.save();
 
       // UPDATE IN USER MODEL AS THE WINNER AND LOSER
-
+      
       const session = await mongoose.startSession();
-
       try {
         session.startTransaction();
-        const winner = await userModel.findOne(
-          { handle: probable_winner },
-          null,
+
+        const guestHandles = guestarray.map((guest) => guest.handle);
+
+        const allParticipantHandles = [hosthandle, ...guestHandles];
+
+        const loserHandles = allParticipantHandles.filter(
+          (handle) => handle !== cfhandle,
+        );
+
+        // MULTI UPDATE IN LOSER
+        const loserUpdate = await userModel.updateMany(
+          { handle: { $in: loserHandles } },
+          { $inc: { losses: 1 } },
           { session },
         );
 
-        const loser = await userModel.findOne(
-          { handle: probable_loser },
-          null,
+        const winnerUpdate = await userModel.updateOne(
+          { handle: cfhandle },
+          { $inc: { wins: 1 } },
           { session },
         );
-
-        if (!winner || !loser) {
-          throw new Error("USER NOT FOUND");
-        }
-
-        winner.wins = winner.wins + 1;
-        loser.losses = loser.losses + 1;
-
-        await winner.save({ session });
-        await loser.save({ session });
 
         await session.commitTransaction();
       } catch (error) {
@@ -184,6 +174,7 @@ export async function POST(request) {
       );
     }
   } catch (error) {
+    console.log(error);
     return Response.json(
       {
         success: false,

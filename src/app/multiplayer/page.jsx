@@ -1,14 +1,13 @@
 "use client";
-import React, { useState } from "react";
-import { LandingHeader } from "./components/LandingHeader";
-import { LandingInput } from "./components/LandingInput";
-import { LandingCreateRoom } from "./components/LandingCreateRoom";
-import { LandingJoinRoom } from "./components/LandingJoinRoom";
-import { LandingCreateButton } from "./components/LandingCreateButton";
-import { LandingJoinButton } from "./components/LandingJoinButton";
-import Error from "next/error";
 import { useRouter } from "next/navigation";
-import { FeatureUpdateBanner } from "./components/LandingFeatureUpdateBanner";
+import React, { useState } from "react";
+import { LandingJoinRoom } from "../components/LandingJoinRoom";
+import { LandingCreateRoom } from "../components/LandingCreateRoom";
+import { LandingJoinButton } from "../components/LandingJoinButton";
+import { LandingCreateButton } from "../components/LandingCreateButton";
+import { LandingInput } from "../components/LandingInput";
+import { LandingHeader } from "../components/LandingHeader";
+import { FeatureUpdateBanner } from "../components/LandingFeatureUpdateBanner";
 
 export default function Page() {
   const [mode, setMode] = useState("create");
@@ -18,8 +17,7 @@ export default function Page() {
   const [buttondisabled, setbuttondisabled] = useState(true);
   const [userverified, setuserverified] = useState(false);
   const [verificationloading, setverificationloading] = useState(false);
-  const [playercount, setplayercount] = useState(2);
-  const [roomtype, setroomtype] = useState("duel");
+  const [playercount, setplayercount] = useState(3);
 
   const router = useRouter();
 
@@ -28,7 +26,7 @@ export default function Page() {
       alert("Please provide codeforce ID");
       throw new Error("codeforce handle not provided");
     }
-    const url = "/api/room/create";
+    const url = "/api/multiplayer/room/create";
     setloading(true);
 
     try {
@@ -39,7 +37,7 @@ export default function Page() {
         },
         body: JSON.stringify({
           hostid: cfid,
-          playercount: playercount,
+          playercount: 3,
         }),
       });
 
@@ -50,7 +48,7 @@ export default function Page() {
       }
 
       const roomcode = data.roomcode;
-      const roomnumber = roomcode;
+      const roomnumber = roomcode.slice(4);
 
       const matchdata = {
         roomcode: roomnumber,
@@ -60,7 +58,7 @@ export default function Page() {
 
       localStorage.setItem("active_match", JSON.stringify(matchdata));
 
-      router.push(`/waiting/${roomcode}`);
+      router.push(`/waiting/${roomnumber}`);
     } catch (error) {
       alert("Error creating new room. Please try again !");
       setloading(false);
@@ -80,7 +78,7 @@ export default function Page() {
     setloading(true);
     const url = "/api/room/join";
     try {
-      const roomcode = roomtype + roomid;
+      const roomcode = "duel" + roomid;
       const roomurl = `/api/room/status/${roomcode}`;
 
       const roomresponse = await fetch(roomurl);
@@ -112,7 +110,7 @@ export default function Page() {
         alert(data.message);
         throw new Error(data.message);
       }
-      const roomnumber = data.roomid;
+      const roomnumber = data.roomid.slice(4);
 
       const stored = localStorage.getItem("active_match");
       const alreadymatchdata = stored ? JSON.parse(stored) : null;
@@ -204,7 +202,6 @@ export default function Page() {
             loading={loading}
             handlecreateroom={handlegenerateroom}
             isbuttondisabled={buttondisabled}
-            setplayercount={setplayercount}
           />
         ) : (
           <LandingJoinRoom
@@ -212,7 +209,6 @@ export default function Page() {
             loading={loading}
             handlejoinroom={handlejoinroom}
             isbuttondisabled={buttondisabled}
-            setroomstatus={setroomtype}
           />
         )}
 

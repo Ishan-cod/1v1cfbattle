@@ -33,16 +33,45 @@ export async function POST(request) {
     const hostid = room.players.host.handle;
 
     if (userid === hostid) {
+      const guestlist = room.players.guest;
       room.players.host.is_ready = true;
 
-      if (room.players.guest.is_ready) {
+      const isRoomFull = room.playercount === guestlist.length + 1;
+
+      const areAllGuestsReady = room.players.guest.every(
+        (guest) => guest.is_ready,
+      );
+
+      if (isRoomFull && areAllGuestsReady) {
         room.status = "READY";
       }
-      await room.save();
 
+      await room.save();
     } else {
-      room.players.guest.is_ready = true;
-      if (room.players.host.is_ready) {
+      const guestlist = room.players.guest;
+      const index = guestlist.findIndex((obj) => obj.handle == userid);
+
+      if (index == -1) {
+        return Response.json(
+          {
+            success: false,
+            message: "guest is not the part of the room",
+          },
+          { status: 404 },
+        );
+      }
+
+      room.players.guest[index].is_ready = true;
+
+      const isRoomFull = room.playercount === guestlist.length + 1;
+
+      const areAllGuestsReady = room.players.guest.every(
+        (guest) => guest.is_ready,
+      );
+
+      const isHostReady = room.players.host.is_ready;
+
+      if (isRoomFull && areAllGuestsReady && isHostReady) {
         room.status = "READY";
       }
 
@@ -57,7 +86,7 @@ export async function POST(request) {
       { status: 200 },
     );
   } catch (error) {
-
+    // console.log(error);
     return Response.json(
       {
         success: false,

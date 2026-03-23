@@ -53,8 +53,12 @@ export async function POST(request) {
     const { rating_min, rating_max, tags, questioncount } = room.settings;
 
     // getting user handle of the room
+
+    // TODO: CURRENTLY CHECKING FOR UNIQUE SUBMISSION FOR THE FIRST TWO PLAYER IN THE MATCH
+    // FIX: Beta version can have this but need to fix this problem in next update.
+
     const user1 = room.players.host.handle;
-    const user2 = room.players.guest.handle;
+    const user2 = room.players.guest[0].handle;
 
     const problemArray = await fetchproblem(
       tags,
@@ -90,28 +94,9 @@ export async function POST(request) {
 
       matchproblems.push(add);
     });
-    // const problemindex = problemArray[0].index;
-    // const problemid = problemArray[0].contestId;
 
-    // const problemURL = `https://codeforces.com/problemset/problem/${problemid}/${problemindex}`;
-
-    // const problemname = problemArray[0].name;
-    // const problemrating = problemArray[0].rating;
-    // const problemtag = problemArray[0].tags;
-
-    // room.match_data = {
-    //   problem: {
-    //     id: problemid,
-    //     index: problemindex,
-    //     name: problemname,
-    //     url: problemURL,
-    //     rating: problemrating,
-    //     tags: problemtag,
-    //   },
-    //   start_time: Math.floor(Date.now() / 1000),
-    // };
     room.match_data = matchproblems;
-    
+
     room.status = "ONGOING";
 
     await room.save();

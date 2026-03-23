@@ -22,8 +22,8 @@ export function LobbyHeader({ roomid, handshake, loader }) {
               Room Code
             </span>
             <div className="flex items-center gap-3 bg-slate-900 border border-slate-700 rounded-lg px-4 py-2">
-              <code className="text-blue-400 font-mono font-bold text-lg">
-                DUEL-{roomid}
+              <code className="text-blue-400 font-mono font-bold text-lg uppercase">
+                {roomid}
               </code>
             </div>
           </div>
