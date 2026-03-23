@@ -6,9 +6,30 @@ const LandingJoinRoom = ({
   loading,
   handlejoinroom,
   isbuttondisabled,
+  setroomstatus,
 }) => {
   return (
     <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+      <div>
+        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2 px-1">
+          Enter room type:
+        </label>
+        <select
+          className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 uppercase"
+          defaultValue={"duel (1 vs 1 room)"}
+          onChange={(e) => {
+            const val = e.target.value.toString().toLowerCase();
+            if (val === "duel (1 vs 1 room)") {
+              setroomstatus("duel");
+            } else {
+              setroomstatus("multi");
+            }
+          }}
+        >
+          <option>duel (1 vs 1 room)</option>
+          <option>multi (N player room)</option>
+        </select>
+      </div>
       <div>
         <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2 px-1">
           Enter Room Code
@@ -23,7 +44,7 @@ const LandingJoinRoom = ({
           onChange={(e) => {
             let val = e.target.value.trim();
             let roomcode = Number(val);
-            setroomid(roomcode);
+            setroomid(val);
           }}
           className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-emerald-500 transition-colors font-mono uppercase text-center tracking-widest"
         />

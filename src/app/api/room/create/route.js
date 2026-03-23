@@ -9,22 +9,33 @@ function generateroomcode() {
       .padStart(4, "0")
   );
 }
+function Multigenerateroomcode() {
+  return (
+    "multi" +
+    Math.floor(Math.random() * 10000)
+      .toString()
+      .padStart(4, "0")
+  );
+}
 
 export async function POST(request) {
   await dbconnect();
 
-  const { hostid } = await request.json();
-  if (!hostid) {
+  const { hostid, playercount } = await request.json();
+  if (!hostid || !playercount) {
     return Response.json(
       {
         success: false,
-        message: "Host ID required",
+        message: "Host ID required or playercount not provided",
       },
       { status: 400 },
     );
   }
 
-  const roomid = generateroomcode();
+  let roomid;
+  if (playercount > 2) {
+    roomid = Multigenerateroomcode();
+  } else roomid = generateroomcode();
 
   try {
     await roomModel.create({
@@ -37,13 +48,14 @@ export async function POST(request) {
           is_verified: true,
         },
       },
+      playercount: playercount,
     });
 
     return Response.json(
       {
         success: true,
         message: "New Room Created",
-        roomcode : roomid
+        roomcode: roomid,
       },
       { status: 201 },
     );

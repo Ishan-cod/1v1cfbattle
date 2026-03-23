@@ -8,6 +8,7 @@ import { Opponent } from "../components/Opponent";
 import { Footer } from "../components/Footer";
 import Error from "next/error";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 export default function Page({ params }) {
   const unwrappedparam = use(params);
@@ -38,7 +39,7 @@ export default function Page({ params }) {
     }
 
     const fetchroomdata = async () => {
-      const url = `/api/room/status/duel${roomcode}`;
+      const url = `/api/room/status/${roomcode}`;
       const response = await fetch(url);
       const data = await response.json();
 
@@ -54,7 +55,7 @@ export default function Page({ params }) {
 
     const getlivefeed = async () => {
       try {
-        const url = `/api/match/feed/duel${roomcode}`;
+        const url = `/api/match/feed/${roomcode}`;
         const response = await fetch(url);
         const data = await response.json();
 
@@ -77,7 +78,7 @@ export default function Page({ params }) {
     setverifyloading(true);
 
     try {
-      const roomid = "duel" + roomcode;
+      const roomid = roomcode;
       const url = "/api/match/verify";
       const cfhandle = activeuser.handle;
 
@@ -126,7 +127,7 @@ export default function Page({ params }) {
     }
 
     try {
-      const url = `/api/room/status/duel${roomcode}`;
+      const url = `/api/room/status/${roomcode}`;
       const response = await fetch(url);
       const data = await response.json();
 
@@ -149,7 +150,7 @@ export default function Page({ params }) {
 
     const fetchroomdata = async () => {
       try {
-        const url = `/api/room/status/duel${roomcode}`;
+        const url = `/api/room/status/${roomcode}`;
         const response = await fetch(url);
         const data = await response.json();
 
@@ -180,7 +181,7 @@ export default function Page({ params }) {
   }, [roomcode, router]);
 
   const cancelmatch = async () => {
-    const roomid = "duel" + roomcode;
+    const roomid = roomcode;
     const url = `/api/room/cancel/${roomid}`;
 
     try {
@@ -195,7 +196,7 @@ export default function Page({ params }) {
 
   const getlivefeed = async () => {
     try {
-      const url = `/api/match/feed/duel${roomcode}`;
+      const url = `/api/match/feed/${roomcode}`;
       const response = await fetch(url);
       const data = await response.json();
 
@@ -213,8 +214,13 @@ export default function Page({ params }) {
   if (!roomdata) {
     return (
       <>
-        <div className="bg-slate-950 text-slate-200 min-h-screen flex flex-col">
-          <div>{/* Loading screen here */}</div>
+        <div className="bg-slate-950 text-slate-200 min-h-screen flex flex-col w-full">
+          <div>
+            <Loader2 />
+            <span className="mx-2 font-mono font-semibold text-white/85">
+              Getting to battle arena. Please Wait!
+            </span>
+          </div>
         </div>
       </>
     );
@@ -232,30 +238,43 @@ export default function Page({ params }) {
         />
 
         <div className="flex-1 max-w-7xl mx-auto w-full grid grid-cols-12 gap-6 p-6">
-          <Player
-            playerdata={roomdata.players[activeuser.role]}
-            live_feed={livefeed}
-          />
+          {activeuser.role == "host" ? (
+            <Player
+              playerdata={roomdata.players.host}
+              live_feed={livefeed}
+              verifysubmission={verifysubmission}
+              verifysubmissionloader={verifyloading}
+            />
+          ) : (
+            <Player
+              playerdata={
+                roomdata.players["guest"][
+                  roomdata.players["guest"].findIndex(
+                    (guest) => guest.handle === activeuser.handle,
+                  )
+                ]
+              }
+              live_feed={livefeed}
+              verifysubmission={verifysubmission}
+              verifysubmissionloader={verifyloading}
+            />
+          )}
+
           <Question
             problemdata={roomdata.match_data[qid - 1].problem}
             roomdata={roomdata}
             qid={qid}
           />
           <Opponent
-            opponentdata={
-              activeuser.role === "host"
-                ? roomdata.players.guest
-                : roomdata.players.host
-            }
+            opponentdata={roomdata.players}
             feed={livefeed}
             getlivefeed={getlivefeed}
             qid={qid}
             setqid={setqid}
             qcount={roomdata.settings.questioncount}
+            activeuser={activeuser}
           />
         </div>
-
-        <Footer verifysubmission={verifysubmission} loading={verifyloading} />
       </div>
     </>
   );

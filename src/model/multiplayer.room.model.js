@@ -18,6 +18,11 @@ const playerschema = new mongoose.Schema(
       type: Number,
       default: null,
     },
+    team: {
+      type: String,
+      enum: ["A", "B"],
+      default: "A",
+    },
   },
   { _id: false },
 );
@@ -67,11 +72,15 @@ const matchdatascheme = new mongoose.Schema(
     start_time: Number,
     end_time: Number,
     winner: String,
+    winnerteam: {
+      type: String,
+      enum: ["A", "B"],
+    },
   },
   { _id: false },
 );
 
-const roomschema = new mongoose.Schema({
+const multiplayerroomschema = new mongoose.Schema({
   roomcode: {
     type: String,
     required: true,
@@ -86,14 +95,14 @@ const roomschema = new mongoose.Schema({
 
   settings: settingschema,
 
-  players: {
-    host: playerschema,
-    guest: [playerschema],
-  },
-
   playercount: {
     type: Number,
     default: 2,
+  },
+
+  players: {
+    host: playerschema,
+    guest: [playerschema],
   },
 
   match_data: [matchdatascheme],
@@ -101,4 +110,5 @@ const roomschema = new mongoose.Schema({
   live_feed: [livefeedschema],
 });
 
-export default mongoose.models.Room || mongoose.model("Room", roomschema);
+export default mongoose.models.Multiplayerroom ||
+  mongoose.model("Multiplayerroom", multiplayerroomschema);

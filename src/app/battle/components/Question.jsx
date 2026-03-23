@@ -2,21 +2,25 @@ import React from "react";
 import Winner from "./Winner";
 
 export function Question({ problemdata, roomdata, qid }) {
-  const player1 = roomdata.players.host.handle;
-  const player2 = roomdata.players.guest.handle;
+  const host = roomdata.players.host.handle;
 
-  let player1win = 0;
-  let player2win = 0;
+  const myMap = new Map();
 
   roomdata.match_data.forEach((e) => {
-    if (e.winner == player1) player1win += 1;
-    else if (e.winner == player2) player2win += 1;
+    myMap.set(e.winner, (myMap.get(e.winner) || 0) + 1);
   });
 
-  let roomwinner;
-  if (player1win > player2win) {
-    roomwinner = player1;
-  } else roomwinner = player2;
+  let winnerplayer = host;
+  let maxwins = 0;
+
+  for (let [key, val] of myMap) {
+    if (val > maxwins) {
+      maxwins = val;
+      winnerplayer = key;
+    }
+  }
+
+  let roomwinner = winnerplayer;
 
   if (roomdata.status == "FINISHED") {
     return (
@@ -27,11 +31,33 @@ export function Question({ problemdata, roomdata, qid }) {
             <div className="font-bold font-mono text-yellow-400 uppercase">
               Winner : {roomwinner}
             </div>
-            <div className="font-bold font-mono">
-              Players :{" "}
-              <div className="flex-col">
-                <div>Player1 : {player1}</div>
-                <div>Player2 : {player2}</div>
+            <div className="font-mono w-full flex flex-col items-center">
+              <p className="text-sm font-bold text-slate-300 mb-2">Players</p>
+
+              <div className="w-full max-w-xs space-y-1">
+                {/* Host */}
+                <div className="flex justify-between px-3 py-1.5 rounded bg-slate-900 border border-slate-800">
+                  <span className="text-slate-400">1.</span>
+                  <span className="flex-1 ml-2 text-slate-200">
+                    {roomdata.players.host.handle}
+                  </span>
+                  <span className="text-[10px] text-yellow-400">HOST</span>
+                </div>
+
+                {/* Guests */}
+                {roomdata.players.guest.map((e, key) => {
+                  return (
+                    <div
+                      key={key}
+                      className="flex justify-between px-3 py-1.5 rounded bg-slate-950 border border-slate-800"
+                    >
+                      <span className="text-slate-400">{key + 2}.</span>
+                      <span className="flex-1 ml-2 text-slate-200">
+                        {e.handle}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -48,12 +74,30 @@ export function Question({ problemdata, roomdata, qid }) {
             <div className="font-bold font-mono text-red-500">
               Match Status : CANCELLED
             </div>
-            <div className="font-bold font-mono">
-              Players :{" "}
-              <div className="flex-col">
-                <div>Player1 : {player1}</div>
-                <div>Player2 : {player2}</div>
+            <div className="w-full max-w-xs space-y-1 flex flex-col justify-center">
+              {/* Host */}
+              <div className="flex justify-between px-3 py-1.5 rounded bg-slate-900 border border-slate-800">
+                <span className="text-slate-400">1.</span>
+                <span className="flex-1 ml-2 text-slate-200">
+                  {roomdata.players.host.handle}
+                </span>
+                <span className="text-[10px] text-yellow-400">HOST</span>
               </div>
+
+              {/* Guests */}
+              {roomdata.players.guest.map((e, key) => {
+                return (
+                  <div
+                    key={key}
+                    className="flex justify-between px-3 py-1.5 rounded bg-slate-950 border border-slate-800"
+                  >
+                    <span className="text-slate-400">{key + 2}.</span>
+                    <span className="flex-1 ml-2 text-slate-200">
+                      {e.handle}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>

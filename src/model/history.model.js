@@ -14,8 +14,12 @@ const matchhistoryschema = new mongoose.Schema({
     required: true,
   },
   opponent: {
-    type: String,
+    type: [String],
     required: true,
+    validate: (v) => v.length > 0,
+  },
+  winner: {
+    type: String,
   },
   problemid: {
     type: String,

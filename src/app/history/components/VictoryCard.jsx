@@ -18,6 +18,13 @@ const DuelHistoryCard = ({
   const durationText = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
 
   const isWin = status === "WIN";
+  console.log(opponent);
+  const opponentstring = opponent
+    .filter((e) => e !== currentUserHandle)
+    .map((e) => e)
+    .join("; ");
+
+  console.log(opponentstring)
 
   return (
     <div
@@ -51,7 +58,9 @@ const DuelHistoryCard = ({
             <span className="text-[10px] text-gray-500 uppercase leading-none">
               Opponent
             </span>
-            <span className="text-sm font-bold text-gray-200">{opponent}</span>
+            <span className="text-sm font-bold text-gray-200">
+              {opponentstring}
+            </span>
           </div>
         </div>
       </div>
