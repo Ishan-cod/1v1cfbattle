@@ -24,7 +24,7 @@ const DuelHistoryCard = ({
     .map((e) => e)
     .join("; ");
 
-  console.log(opponentstring)
+  console.log(opponentstring);
 
   return (
     <div
@@ -46,9 +46,14 @@ const DuelHistoryCard = ({
           >
             {status}
           </span>
-          <p className="text-lg font-black text-white mt-1 leading-none">
-            {problemid}
-          </p>
+          <a
+            href={`https://codeforces.com/problemset/problem/${problemid.slice(0, -1)}/${problemid.at(-1)}`}
+            target="_blank"
+          >
+            <p className="text-lg font-black text-white mt-1 leading-none">
+              {problemid}
+            </p>
+          </a>
         </div>
 
         <div className="h-10 w-[1px] bg-white/10 hidden sm:block" />
@@ -66,17 +71,19 @@ const DuelHistoryCard = ({
       </div>
 
       {/* Middle Section: Stats (Desktop Only) */}
-      <div className="hidden md:flex flex-col items-center">
-        <span className="text-[10px] text-gray-500 uppercase">Duration</span>
-        <span className="text-sm font-mono text-blue-400 font-medium">
-          {durationText}
-        </span>
-      </div>
+      <div className="flex items-center justify-center">
+        <div className="hidden md:flex flex-col items-center mx-4">
+          <span className="text-[10px] text-gray-500 uppercase">Duration</span>
+          <span className="text-sm font-mono text-blue-400 font-medium">
+            {durationText}
+          </span>
+        </div>
 
-      {/* Right Section: Date & Time */}
-      <div className="text-right">
-        <p className="text-sm font-semibold text-gray-300">{date}</p>
-        <p className="text-[10px] text-gray-500 font-mono">{time}</p>
+        {/* Right Section: Date & Time */}
+        <div className="text-right">
+          <p className="text-sm font-semibold text-gray-300">{date}</p>
+          <p className="text-[10px] text-gray-500 font-mono">{time}</p>
+        </div>
       </div>
     </div>
   );
