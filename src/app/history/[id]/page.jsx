@@ -4,8 +4,7 @@ import { UserImage } from "../components/UserImage";
 import { UserDetail } from "../components/UserDetail";
 import { UserRating } from "../components/UserRating";
 import { UserWinLose } from "../components/UserWinLose";
-import { DuelHistoryCard, VictoryCard } from "../components/VictoryCard";
-import { LossCard } from "../components/LossCard";
+import { DuelHistoryCard } from "../components/VictoryCard";
 import { Loader2 } from "lucide-react";
 
 const Page = ({ params }) => {
@@ -89,6 +88,7 @@ const Page = ({ params }) => {
                 opponent={e.opponent}
                 starttime={e.starttime}
                 status={e.status}
+                roomcode={e.roomcode}
               />
             );
           })}
