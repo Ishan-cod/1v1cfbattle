@@ -1,6 +1,6 @@
 "use client";
 
-import React, { act, use, useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { BattleHeader } from "../components/Header";
 import { Player } from "../components/Player";
 import { Question } from "../components/Question";
@@ -22,6 +22,7 @@ export default function Page({ params }) {
   const [verifyloading, setverifyloading] = useState(false);
   const [livefeed, setlivefeed] = useState([]);
   const [qid, setqid] = useState(1);
+  const [matchfinished, setmatchfinished] = useState(false);
 
   useEffect(() => {
     try {
@@ -48,6 +49,14 @@ export default function Page({ params }) {
         setroommessage(data.message);
 
         throw new Error("Error founding room status");
+      }
+
+      if (
+        data.roomstatus.status == "FINISHED" ||
+        data.roomstatus.status == "CANCELLED"
+      ) {
+        setqid(-1);
+        setmatchfinished(true);
       }
 
       setroomdata(data.roomstatus);
@@ -160,9 +169,21 @@ export default function Page({ params }) {
           throw new Error("Error finding room status");
         }
 
+        if (
+          data.roomstatus.status == "FINISHED" ||
+          data.roomstatus.status == "CANCELLED"
+        ) {
+          setqid(-1);
+          setmatchfinished(true);
+        }
+
         setroomdata(data.roomstatus);
 
-        if (data.roomstatus.status === "CANCELLED") {
+        if (
+          data.roomstatus.status === "CANCELLED" ||
+          data.roomstatus.status === "FINISHED"
+        ) {
+          console.log("MATCH ENDED STOPPING POLLING");
           clearInterval(interval);
         }
       } catch (error) {
@@ -175,7 +196,7 @@ export default function Page({ params }) {
       }
     };
 
-    interval = setInterval(fetchroomdata, 15000);
+    interval = setInterval(fetchroomdata, 10000);
     fetchroomdata();
     return () => clearInterval(interval);
   }, [roomcode, router]);
@@ -214,9 +235,9 @@ export default function Page({ params }) {
   if (!roomdata) {
     return (
       <>
-        <div className="bg-slate-950 text-slate-200 min-h-screen flex flex-col w-full">
-          <div>
-            <Loader2 />
+        <div className="bg-slate-950 text-slate-200 min-h-screen flex items-center justify-center w-full h-screen">
+          <div className="flex items-center justify-center min-w-xl">
+            <Loader2 className="animate-spin" />
             <span className="mx-2 font-mono font-semibold text-white/85">
               Getting to battle arena. Please Wait!
             </span>
@@ -261,7 +282,11 @@ export default function Page({ params }) {
           )}
 
           <Question
-            problemdata={roomdata.match_data[qid - 1].problem}
+            problemdata={
+              qid === -1
+                ? roomdata.match_data[0].problem
+                : roomdata.match_data[qid - 1].problem
+            }
             roomdata={roomdata}
             qid={qid}
           />
@@ -273,6 +298,7 @@ export default function Page({ params }) {
             setqid={setqid}
             qcount={roomdata.settings.questioncount}
             activeuser={activeuser}
+            ismatchfinished={matchfinished}
           />
         </div>
       </div>

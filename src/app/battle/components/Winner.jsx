@@ -1,26 +1,41 @@
 import React from "react";
+import { Timer } from "lucide-react";
 
-const Winner = ({ winnerid }) => {
+const Winner = ({ winnerid, totalTime }) => {
+  const totalSeconds = Number(totalTime) || 0;
+  const mins = Math.floor(totalSeconds / 60);
+  const secs = totalSeconds % 60;
+
   return (
-    <div className="relative overflow-hidden bg-slate-900/50 border border-emerald-500/30 rounded-xl p-6 flex flex-col items-center justify-center min-w-70 shadow-[0_0_30px_rgba(16,185,129,0.1)]">
-      <div className="flex items-center gap-2 mb-2">
-        <div className="h-px w-8 bg-emerald-500/50"></div>
-        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500">
-          Winner
-        </span>
-        <div className="h-px w-8 bg-emerald-500/50"></div>
-      </div>
+    <div className="max-w-sm mx-auto">
+      <div className="rounded-xl border border-white/10 bg-slate-900/70 px-5 py-4 backdrop-blur-sm hover:border-white/20 transition">
+        {/* Top Row */}
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs text-slate-400 uppercase tracking-wide">
+            Question Solved
+          </span>
+          <span className="text-xs text-emerald-400 font-medium">VERIFIED</span>
+        </div>
 
-      <div className="relative">
-        <h2 className="text-4xl font-black text-white uppercase tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+        {/* User */}
+        <h2 className="text-lg font-semibold text-white truncate mb-3">
           {winnerid}
         </h2>
 
-        <div className="absolute -bottom-1 left-0 w-full h-1 bg-linear-to-r from-transparent via-emerald-500 to-transparent opacity-50"></div>
-      </div>
+        {/* Time */}
+        <div className="flex items-center justify-between text-sm text-slate-400">
+          <div className="flex items-center gap-2">
+            <Timer className="w-4 h-4" />
+            <span>Time</span>
+          </div>
 
-      <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/10 blur-[50px] rounded-full"></div>
-      <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-500/10 blur-[50px] rounded-full"></div>
+          <span className="font-mono text-white">
+            {totalTime !== null && totalTime !== undefined
+              ? `${mins}m ${secs}s`
+              : "--"}
+          </span>
+        </div>
+      </div>
     </div>
   );
 };

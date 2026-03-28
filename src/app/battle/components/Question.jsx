@@ -1,28 +1,11 @@
 import React from "react";
 import Winner from "./Winner";
+import { decideWinner } from "@/lib/decideWinner";
 
 export function Question({ problemdata, roomdata, qid }) {
-  const host = roomdata.players.host.handle;
-
-  const myMap = new Map();
-
-  roomdata.match_data.forEach((e) => {
-    myMap.set(e.winner, (myMap.get(e.winner) || 0) + 1);
-  });
-
-  let winnerplayer = host;
-  let maxwins = 0;
-
-  for (let [key, val] of myMap) {
-    if (val > maxwins) {
-      maxwins = val;
-      winnerplayer = key;
-    }
-  }
-
-  let roomwinner = winnerplayer;
-
-  if (roomdata.status == "FINISHED") {
+  if (roomdata.status == "FINISHED" && qid === -1) {
+    const deciderobj = decideWinner({ roomdata: roomdata });
+    const roomwinner = deciderobj.roomwinner;
     return (
       <>
         <section className="col-span-6 space-y-6">
@@ -38,10 +21,13 @@ export function Question({ problemdata, roomdata, qid }) {
                 {/* Host */}
                 <div className="flex justify-between px-3 py-1.5 rounded bg-slate-900 border border-slate-800">
                   <span className="text-slate-400">1.</span>
-                  <span className="flex-1 ml-2 text-slate-200">
-                    {roomdata.players.host.handle}
+                  <span className="flex-1 ml-2 text-slate-100">
+                    {roomdata.players.host.handle}{" "}
+                    <span className="text-yellow-400">[H]</span>
                   </span>
-                  <span className="text-[10px] text-yellow-400">HOST</span>
+                  <span className="text-yellow-400">
+                    {deciderobj.wincount[roomdata.players.host.handle]}
+                  </span>
                 </div>
 
                 {/* Guests */}
@@ -53,8 +39,9 @@ export function Question({ problemdata, roomdata, qid }) {
                     >
                       <span className="text-slate-400">{key + 2}.</span>
                       <span className="flex-1 ml-2 text-slate-200">
-                        {e.handle}
+                        {e.handle} [G]
                       </span>
+                      <span>{deciderobj.wincount[e.handle]}</span>
                     </div>
                   );
                 })}
@@ -66,7 +53,7 @@ export function Question({ problemdata, roomdata, qid }) {
     );
   }
 
-  if (roomdata.status == "CANCELLED") {
+  if (roomdata.status == "CANCELLED" && qid === -1) {
     return (
       <>
         <section className="col-span-6 space-y-6">
@@ -104,6 +91,7 @@ export function Question({ problemdata, roomdata, qid }) {
       </>
     );
   }
+
   return (
     <>
       <section className="col-span-6 space-y-6">
@@ -136,7 +124,13 @@ export function Question({ problemdata, roomdata, qid }) {
           </div>
 
           {roomdata.match_data[qid - 1].winner ? (
-            <Winner winnerid={roomdata.match_data[qid - 1].winner} />
+            <Winner
+              winnerid={roomdata.match_data[qid - 1].winner}
+              totalTime={
+                roomdata.match_data[qid - 1].end_time -
+                roomdata.match_data[qid - 1].start_time
+              }
+            />
           ) : (
             <></>
           )}

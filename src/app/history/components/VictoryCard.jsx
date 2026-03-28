@@ -73,11 +73,11 @@ const DuelHistoryCard = ({
       <div className="flex items-center justify-between">
         {roomcode.slice(0, 4).toUpperCase() == "DUEL" ? (
           <div className="px-3 py-1 text-sm font-medium bg-yellow-600/20 text-yellow-400 rounded-full border border-yellow-500/30 uppercase">
-            {roomcode}
+            DUEL
           </div>
         ) : (
           <div className="px-3 py-1 text-sm font-medium bg-purple-600/20 text-purple-400 rounded-full border border-purple-500/30 uppercase">
-            {roomcode}
+            MULTI
           </div>
         )}
 
