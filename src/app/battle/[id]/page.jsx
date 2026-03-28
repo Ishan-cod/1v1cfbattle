@@ -55,7 +55,7 @@ export default function Page({ params }) {
         data.roomstatus.status == "FINISHED" ||
         data.roomstatus.status == "CANCELLED"
       ) {
-        // setqid(-1);
+        setqid(-1);
         setmatchfinished(true);
       }
 
@@ -173,7 +173,7 @@ export default function Page({ params }) {
           data.roomstatus.status == "FINISHED" ||
           data.roomstatus.status == "CANCELLED"
         ) {
-          // setqid(-1);
+          setqid(-1);
           setmatchfinished(true);
         }
 
