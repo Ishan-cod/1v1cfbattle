@@ -10,6 +10,8 @@ const UserImage = ({ imageurl }) => {
         width={40}
         height={40}
         alt="User Avatar"
+        unoptimized
+        quality={100}
         className="relative w-40 h-40 md:w-48 md:h-48 rounded-3xl border-2 border-white/10 bg-[#0d1117] object-cover shadow-2xl"
       />
     </div>
