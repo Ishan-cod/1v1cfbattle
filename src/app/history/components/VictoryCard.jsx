@@ -8,6 +8,7 @@ const DuelHistoryCard = ({
   problemid,
   status,
   currentUserHandle,
+  roomcode,
 }) => {
   const { date, time } = formatCFTime(starttime);
 
@@ -23,8 +24,6 @@ const DuelHistoryCard = ({
     .filter((e) => e !== currentUserHandle)
     .map((e) => e)
     .join("; ");
-
-  console.log(opponentstring);
 
   return (
     <div
@@ -71,7 +70,17 @@ const DuelHistoryCard = ({
       </div>
 
       {/* Middle Section: Stats (Desktop Only) */}
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-between">
+        {roomcode.slice(0, 4).toUpperCase() == "DUEL" ? (
+          <div className="px-3 py-1 text-sm font-medium bg-yellow-600/20 text-yellow-400 rounded-full border border-yellow-500/30 uppercase">
+            {roomcode}
+          </div>
+        ) : (
+          <div className="px-3 py-1 text-sm font-medium bg-purple-600/20 text-purple-400 rounded-full border border-purple-500/30 uppercase">
+            {roomcode}
+          </div>
+        )}
+
         <div className="hidden md:flex flex-col items-center mx-4">
           <span className="text-[10px] text-gray-500 uppercase">Duration</span>
           <span className="text-sm font-mono text-blue-400 font-medium">
