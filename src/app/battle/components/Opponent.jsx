@@ -10,6 +10,7 @@ export function Opponent({
   qid,
   qcount,
   activeuser,
+  ismatchfinished
 }) {
   const allplayerhandle = [];
   if (opponentdata.host.handle != activeuser.handle)
@@ -66,11 +67,9 @@ export function Opponent({
           </div>
 
           <div className="mt-5">
-            <Options setqid={setqid} qcount={qcount} qid={qid} />
+            <Options setqid={setqid} qcount={qcount} qid={qid} matchfinished={ismatchfinished}/>
           </div>
         </div>
-
-        <LiveFeed getlivefeed={getlivefeed} livefeed={feed} />
       </section>
     </>
   );
