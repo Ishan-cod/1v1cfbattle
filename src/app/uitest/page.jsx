@@ -1,12 +1,8 @@
-import React from 'react'
-import TerminalChatUI from './components/TerminalChat'
+import React from "react";
+import TerminalChatUI from "./components/TerminalChat";
 
 const Page = () => {
-  return (
-    <div>
-      <TerminalChatUI/>
-    </div>
-  )
-}
+  return <div></div>;
+};
 
-export default Page
+export default Page;
