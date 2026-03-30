@@ -1,56 +1,72 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { MessageCircle, X, Send } from "lucide-react";
 import { getSocket } from "@/lib/getSocket";
 import { getTimeHHMM } from "@/lib/getTimeHHMM";
+import { JoinChat } from "./JoinChat";
+import { LeaveChat } from "./LeaveChat";
+import { getRandomColor } from "@/lib/getRandomColor";
 
-const initialMessages = [
-  {
-    id: 1,
-    sender: "YOU",
-    time: "13:28",
-    text: "Hi, wadddup big dog 🐕",
-    accent: "text-emerald-400",
-  },
-  {
-    id: 2,
-    sender: "anonymous-bear-CmtU5",
-    time: "13:29",
-    text: "this video is awesome",
-    accent: "text-blue-400",
-  },
-  {
-    id: 3,
-    sender: "YOU",
-    time: "13:30",
-    text: "this is real-time",
-    accent: "text-emerald-400",
-  },
-];
+// const initialMessages = [
+//   {
+//     id: 1,
+//     sender: "system",
+//     type: "join",
+//     time: "13:28",
+//     text: "only_error",
+//     accent: "",
+//   },
+//   {
+//     id: 2,
+//     sender: "anonymous-bear-CmtU5",
+//     type: "chat",
+//     time: "13:29",
+//     text: "this video is awesome",
+//     accent: "text-blue-400",
+//   },
+//   {
+//     id: 3,
+//     sender: "anonymous-bear-CmtU5",
+//     type: "chat",
+//     time: "13:29",
+//     text: "this video is awesome",
+//     accent: "text-blue-400",
+//   },
+//   {
+//     id: 4,
+//     sender: "system",
+//     type: "leave",
+//     time: "13:30",
+//     text: "manaskumar10",
+//     accent: "",
+//   },
+// ];
 
-export function TerminalChatUI({ children, roomcode }) {
+export function TerminalChatUI({ children, roomcode, currentuser }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [value, setValue] = useState("");
-  const [currentuser, setcurrentuser] = useState("undefinied");
+  const scrollRef = useRef(null);
+  const usercolor = getRandomColor();
 
+  // scroll to bottom
   useEffect(() => {
-    const storagedata = localStorage.getItem("active_match");
-    const localdata = JSON.parse(storagedata) || null;
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, [messages]);
+  // end
 
-    if (!localdata) return;
-    const handle = localdata.cfhandle;
-    if (!handle) return;
-
-    setcurrentuser(handle);
-  }, []);
-
+  // socket functions
   useEffect(() => {
-    const socket = getSocket();
+    const socket = getSocket({ roomcode: roomcode, username: currentuser });
     if (!socket) return;
-
+    console.log(currentuser)
     const onConnect = () => {
-      console.log("Connected to SOCKET", socket.id);
+      // console.log("Connected to SOCKET", socket.id);
     };
 
     if (socket.connected) {
@@ -59,21 +75,24 @@ export function TerminalChatUI({ children, roomcode }) {
 
     socket.on("connect", onConnect);
 
-    socket.emit("join_room", roomcode);
+    socket.emit("join_room");
 
     const onRecieveMessage = (msgobj) => {
       setMessages((prev) => [...prev, msgobj]);
     };
+
+    socket.on("message", onRecieveMessage);
     socket.on("recieve_message", onRecieveMessage);
 
     return () => {
+      socket.off("message", onRecieveMessage);
       socket.off("connect", onConnect);
       socket.off("recieve_message", onRecieveMessage);
     };
   }, []);
 
   const sendMessage = () => {
-    const socket = getSocket();
+    const socket = getSocket({ roomcode: roomcode, username: currentuser });
 
     const text = value.trim();
     if (!text) return;
@@ -83,27 +102,20 @@ export function TerminalChatUI({ children, roomcode }) {
       sender: currentuser,
       time: getTimeHHMM(),
       text,
-      accent: "text-emerald-400",
+      accent: usercolor,
     };
 
-    socket.emit("send_message", msgobj, roomcode);
+    socket.emit("send_message", msgobj);
     setMessages((prev) => [...prev, msgobj]);
     setValue("");
   };
+  // end
 
   return (
     <div className="min-h-screen w-full bg-[#050505] text-white relative overflow-hidden">
-      {/* Your page content stays untouched behind the chat */}
-      {/* <div className="p-8 md:p-12 max-w-4xl mx-auto">
-        <h1 className="text-3xl md:text-5xl font-black tracking-tight">
-          Main UI Content
-        </h1>
-        <p className="mt-4 text-white/60 max-w-2xl">
-          The chat opens as an overlay sidebar from the right without disturbing the page layout.
-        </p>
-      </div> */}
       {children}
-      {/* Floating button */}
+
+      {/*button */}
       <button
         onClick={() => setOpen(true)}
         className={`fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full border border-white/10 bg-black/90 px-4 py-3 shadow-2xl backdrop-blur-md transition-all duration-300 hover:scale-105 hover:bg-black ${
@@ -157,24 +169,41 @@ export function TerminalChatUI({ children, roomcode }) {
               scrollbarWidth: "none",
               msOverflowStyle: "none",
             }}
+            ref={scrollRef}
           >
-            {messages.map((msg) => (
-              <div key={msg.id} className="leading-relaxed">
-                <div className="flex items-center gap-3 flex-wrap mb-1">
-                  <span
-                    className={`${msg.accent} text-[8px] md:text-xs font-bold uppercase tracking-wide`}
-                  >
-                    {msg.sender}
-                  </span>
-                  <span className="text-white/35 text-[8px] md:text-xs">
-                    {msg.time}
-                  </span>
-                </div>
-                <div className="text-xs md:text-[14px] text-white/90 whitespace-pre-wrap break-words">
-                  {msg.text}
-                </div>
-              </div>
-            ))}
+            {messages.map((msg, key) => {
+              if (!msg) return null;
+
+              if (msg.sender === "system" && msg.type === "join") {
+                return (
+                  <>
+                    <JoinChat name={msg.text} time={msg.time} key={msg.id} />
+                  </>
+                );
+              } else if (msg.sender === "system" && msg.type === "leave") {
+                return (
+                  <LeaveChat name={msg.text} time={msg.time} key={msg.id} />
+                );
+              } else {
+                return (
+                  <div key={msg.id} className="leading-relaxed">
+                    <div className="flex items-center gap-3 flex-wrap mb-1">
+                      <span
+                        className={`${msg.accent} text-[8px] md:text-xs font-bold uppercase tracking-wide`}
+                      >
+                        {msg.sender}
+                      </span>
+                      <span className="text-white/35 text-[8px] md:text-xs">
+                        {msg.time}
+                      </span>
+                    </div>
+                    <div className="text-xs md:text-[14px] text-white/90 whitespace-pre-wrap break-words">
+                      {msg.text}
+                    </div>
+                  </div>
+                );
+              }
+            })}
           </div>
 
           <div className="border-t border-white/10 p-4 bg-black/70">

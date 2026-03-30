@@ -250,7 +250,7 @@ export default function Page({ params }) {
 
   return (
     <>
-      <TerminalChatUI roomcode={roomcode}>
+      <TerminalChatUI roomcode={roomcode} currentuser={activeuser.handle}>
         <div className="bg-slate-950 text-slate-200 min-h-screen flex flex-col">
           <BattleHeader
             roomid={roomdata.roomcode}
