@@ -18,6 +18,16 @@ export async function GET(request, { params }) {
       );
     }
 
+    if (room.status === "FINISHED") {
+      return Response.json(
+        {
+          success: false,
+          message: "This is match is already finished",
+        },
+        { status: 400 },
+      );
+    }
+
     room.status = "CANCELLED";
     await room.save();
 
@@ -30,7 +40,7 @@ export async function GET(request, { params }) {
       {
         success: false,
         message: "CANCELLING MATCH FAILED",
-        error : error.message
+        error: error.message,
       },
       { status: 500 },
     );
