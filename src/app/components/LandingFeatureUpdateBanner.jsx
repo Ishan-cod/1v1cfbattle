@@ -8,7 +8,7 @@ const FeatureUpdateBanner = () => {
 
   return (
     <div className="fixed top-4 right-4 z-[100] animate-in fade-in slide-in-from-right-4 duration-300">
-      <div className="bg-red-500 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-white/20 backdrop-blur-sm">
+      <div className="bg-purple-950 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-white/20 backdrop-blur-sm">
         {/* Icon */}
         <div className="bg-white/20 p-1.5 rounded-lg">
           <Sparkles size={16} className="text-blue-100" />
@@ -16,11 +16,11 @@ const FeatureUpdateBanner = () => {
 
         {/* Text Content */}
         <div className="flex flex-col pr-2">
-          <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">
-            Major Update
+          <span className="text-[10px] font-bold uppercase tracking-wider opacity-80 my-1">
+            Let's go crazy!!
           </span>
           <p className="text-sm font-semibold whitespace-nowrap">
-            Multiplayer feature introduced (BETA version)
+            Chat section (COOL) has been introduced in battle area.
           </p>
           <p className="text-sm font-semibold whitespace-nowrap">
             TRY OUT !
