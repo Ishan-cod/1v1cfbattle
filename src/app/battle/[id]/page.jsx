@@ -9,6 +9,7 @@ import { Footer } from "../components/Footer";
 import Error from "next/error";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import { TerminalChatUI } from "@/app/uitest/components/TerminalChat";
 
 export default function Page({ params }) {
   const unwrappedparam = use(params);
@@ -249,59 +250,61 @@ export default function Page({ params }) {
 
   return (
     <>
-      <div className="bg-slate-950 text-slate-200 min-h-screen flex flex-col">
-        <BattleHeader
-          roomid={roomdata.roomcode}
-          starttime={roomdata.match_data[0].start_time}
-          timelimit={roomdata.settings.time_limit_mins}
-          roomdata={roomdata}
-          cancelmatch={cancelmatch}
-        />
-
-        <div className="flex-1 max-w-7xl mx-auto w-full grid grid-cols-12 gap-6 p-6">
-          {activeuser.role == "host" ? (
-            <Player
-              playerdata={roomdata.players.host}
-              live_feed={livefeed}
-              verifysubmission={verifysubmission}
-              verifysubmissionloader={verifyloading}
-            />
-          ) : (
-            <Player
-              playerdata={
-                roomdata.players["guest"][
-                  roomdata.players["guest"].findIndex(
-                    (guest) => guest.handle === activeuser.handle,
-                  )
-                ]
-              }
-              live_feed={livefeed}
-              verifysubmission={verifysubmission}
-              verifysubmissionloader={verifyloading}
-            />
-          )}
-
-          <Question
-            problemdata={
-              qid === -1
-                ? roomdata.match_data[0].problem
-                : roomdata.match_data[qid - 1].problem
-            }
+      <TerminalChatUI roomcode={roomcode}>
+        <div className="bg-slate-950 text-slate-200 min-h-screen flex flex-col">
+          <BattleHeader
+            roomid={roomdata.roomcode}
+            starttime={roomdata.match_data[0].start_time}
+            timelimit={roomdata.settings.time_limit_mins}
             roomdata={roomdata}
-            qid={qid}
+            cancelmatch={cancelmatch}
           />
-          <Opponent
-            opponentdata={roomdata.players}
-            feed={livefeed}
-            getlivefeed={getlivefeed}
-            qid={qid}
-            setqid={setqid}
-            qcount={roomdata.settings.questioncount}
-            activeuser={activeuser}
-            ismatchfinished={matchfinished}
-          />
+
+          <div className="flex-1 max-w-7xl mx-auto w-full grid grid-cols-12 gap-6 p-6">
+            {activeuser.role == "host" ? (
+              <Player
+                playerdata={roomdata.players.host}
+                live_feed={livefeed}
+                verifysubmission={verifysubmission}
+                verifysubmissionloader={verifyloading}
+              />
+            ) : (
+              <Player
+                playerdata={
+                  roomdata.players["guest"][
+                    roomdata.players["guest"].findIndex(
+                      (guest) => guest.handle === activeuser.handle,
+                    )
+                  ]
+                }
+                live_feed={livefeed}
+                verifysubmission={verifysubmission}
+                verifysubmissionloader={verifyloading}
+              />
+            )}
+
+            <Question
+              problemdata={
+                qid === -1
+                  ? roomdata.match_data[0].problem
+                  : roomdata.match_data[qid - 1].problem
+              }
+              roomdata={roomdata}
+              qid={qid}
+            />
+            <Opponent
+              opponentdata={roomdata.players}
+              feed={livefeed}
+              getlivefeed={getlivefeed}
+              qid={qid}
+              setqid={setqid}
+              qcount={roomdata.settings.questioncount}
+              activeuser={activeuser}
+              ismatchfinished={matchfinished}
+            />
+          </div>
         </div>
-      </div>
+      </TerminalChatUI>
     </>
   );
 }

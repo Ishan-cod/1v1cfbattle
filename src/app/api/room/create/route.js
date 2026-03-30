@@ -4,17 +4,13 @@ import roomModel from "@/model/room.model";
 function generateroomcode() {
   return (
     "duel" +
-    Math.floor(Math.random() * 10000)
-      .toString()
-      .padStart(4, "0")
+    (Math.floor(Math.random() * 9000) + 1000).toString().padStart(4, "0")
   );
 }
 function Multigenerateroomcode() {
   return (
     "multi" +
-    Math.floor(Math.random() * 10000)
-      .toString()
-      .padStart(4, "0")
+    (Math.floor(Math.random() * 9000) + 1000).toString().padStart(4, "0")
   );
 }
 

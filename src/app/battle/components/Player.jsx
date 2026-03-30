@@ -1,5 +1,7 @@
+import TerminalChatUI from "@/app/uitest/components/TerminalChat";
 import { Loader2 } from "lucide-react";
 import React from "react";
+import { Opponent } from "./Opponent";
 
 export function Player({
   playerdata,
@@ -11,6 +13,23 @@ export function Player({
   return (
     <>
       <section className="col-span-3 space-y-6">
+        <div>
+          {verifysubmissionloader ? (
+            <button
+              className="w-full rounded-xl border border-emerald-400/30 bg-emerald-400/15 px-4 py-3 font-semibold text-emerald-200 backdrop-blur-sm shadow-[0_0_20px_rgba(52,211,153,0.15)] transition-all duration-200 hover:bg-emerald-400/25 hover:text-white hover:shadow-[0_0_25px_rgba(52,211,153,0.25)] active:scale-[0.98] justify-center flex"
+              disabled
+            >
+              <Loader2 className="animate-spin" />
+            </button>
+          ) : (
+            <button
+              className="w-full rounded-xl border border-emerald-400/30 bg-emerald-400/15 px-4 py-3 font-semibold text-emerald-200 backdrop-blur-sm shadow-[0_0_20px_rgba(52,211,153,0.15)] transition-all duration-200 hover:bg-emerald-400/25 hover:text-white hover:shadow-[0_0_25px_rgba(52,211,153,0.25)] active:scale-[0.98]"
+              onClick={verifysubmission}
+            >
+              Verify submission for this question
+            </button>
+          )}
+        </div>
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
           <div className="flex items-center gap-3 mb-4 p-1.5 rounded bg-black">
             <div className="w-10 h-10 rounded-full bg-blue-500/20 border border-green-500 flex items-center justify-center text-green-400 font-bold uppercase">
@@ -57,23 +76,6 @@ export function Player({
               }
             })}
           </div>
-        </div>
-        <div>
-          {verifysubmissionloader ? (
-            <button
-              className="w-full rounded-xl border border-emerald-400/30 bg-emerald-400/15 px-4 py-3 font-semibold text-emerald-200 backdrop-blur-sm shadow-[0_0_20px_rgba(52,211,153,0.15)] transition-all duration-200 hover:bg-emerald-400/25 hover:text-white hover:shadow-[0_0_25px_rgba(52,211,153,0.25)] active:scale-[0.98] justify-center flex"
-              disabled
-            >
-              <Loader2 className="animate-spin" />
-            </button>
-          ) : (
-            <button
-              className="w-full rounded-xl border border-emerald-400/30 bg-emerald-400/15 px-4 py-3 font-semibold text-emerald-200 backdrop-blur-sm shadow-[0_0_20px_rgba(52,211,153,0.15)] transition-all duration-200 hover:bg-emerald-400/25 hover:text-white hover:shadow-[0_0_25px_rgba(52,211,153,0.25)] active:scale-[0.98]"
-              onClick={verifysubmission}
-            >
-              Verify submission for this question
-            </button>
-          )}
         </div>
       </section>
     </>
