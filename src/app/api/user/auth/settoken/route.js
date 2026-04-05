@@ -114,9 +114,14 @@ export async function POST(request) {
     const newhistory = {
       handle: userhandle,
     };
-
     const createduser = await userModel.create(newuser);
-    const createdhistory = await historyModel.create(newhistory);
+
+    const existinghistory = await historyModel.findOne({ handle: userhandle });
+
+    if (!existinghistory) {
+      const createdhistory = await historyModel.create(newhistory);
+    }
+
     // history model creation ended
 
     return Response.json(
