@@ -7,19 +7,11 @@ async function alreadySubmittedCheck(user1, user2) {
   const url_user2 = `https://codeforces.com/api/user.status?handle=${player2}`;
 
   try {
-    // console.log("HERE1");
     const response_user1 = await fetch(url_user1);
     const response_user2 = await fetch(url_user2);
 
-    // console.log("HERE2");
-
     const data_user1 = await response_user1.json();
     const data_user2 = await response_user2.json();
-
-    // console.log(data_user2);
-    // console.log(data_user1);
-
-    // console.log("HERE3");
 
     const solvedquestions_user1 = data_user1.result.filter(
       (e) => e.verdict == "OK",
@@ -50,15 +42,12 @@ async function alreadySubmittedCheck(user1, user2) {
       solved_question_set.add(problemid);
     });
 
-    // console.log(solved_question_set);
     return {
       error: false,
       message: "Fetch successfull",
       data_set: solved_question_set,
     };
   } catch (error) {
-    // console.log("HERE_ERROR");
-
     return {
       error: true,
       message: "an error occured while getting" + error.message,
