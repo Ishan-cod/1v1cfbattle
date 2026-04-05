@@ -9,6 +9,7 @@ import { LandingJoinButton } from "./components/LandingJoinButton";
 import Error from "next/error";
 import { useRouter } from "next/navigation";
 import { FeatureUpdateBanner } from "./components/LandingFeatureUpdateBanner";
+import { CodeforcesErrorChallenge } from "./uitest/components/MakeCompilationError";
 
 export default function Page() {
   const [mode, setMode] = useState("create");
@@ -20,6 +21,7 @@ export default function Page() {
   const [verificationloading, setverificationloading] = useState(false);
   const [playercount, setplayercount] = useState(2);
   const [roomtype, setroomtype] = useState("duel");
+  const [isCompileErrorOpen, setisCompileErrorOpen] = useState(false);
 
   const router = useRouter();
 
@@ -153,20 +155,23 @@ export default function Page() {
       }
 
       const codeforceid = cfid.trim();
-      const url = "/api/user/verify";
+      const url = "/api/user/auth/checktoken";
       const response = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "same-origin",
         body: JSON.stringify({
           cfhandle: codeforceid,
         }),
       });
-
       const data = await response.json();
+
       if (!data.success) {
-        throw new Error(data.message);
+        setisCompileErrorOpen(true);
+        setverificationloading(false);
+        return;
       }
 
       setbuttondisabled(false);
@@ -184,6 +189,12 @@ export default function Page() {
     <div className="bg-slate-950 text-slate-200 min-h-screen flex flex-col items-center justify-center p-6 font-sans bg-[radial-gradient(circle_at_top,var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-slate-950">
       <FeatureUpdateBanner />
       <LandingHeader />
+
+      <CodeforcesErrorChallenge
+        cfhandle={cfid}
+        isOpen={isCompileErrorOpen}
+        setIsOpen={setisCompileErrorOpen}
+      />
 
       <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl shadow-black/50">
         <LandingInput

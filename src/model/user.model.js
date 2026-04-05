@@ -5,6 +5,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  authtoken: {
+    type: String,
+  },
   rating: {
     type: Number,
     required: true,
